@@ -1,8 +1,27 @@
 
+
+let config = {
+  minZoom: 1,
+  maxZomm: 18,
+};
+
+const zoom = 2;
+const lat = 0;
+const lng = 0;
+
+const map = L.map('map', config).setView([lat, lng], zoom);
+
+// Used to load and display tile layers on the map
+// Most tile servers require attribution, which you can set under `Layer`
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution:
+    '',
+}).addTo(map);
+
 window.addEventListener('DOMContentLoaded', function () {
   // Autocomplete
   new Autocomplete('search', {
-    delay: 1000,
+    delay: 300,
     selectFirst: true,
     howManyCharacters: 2,
     onSearch: function ({ currentValue }) {
@@ -114,21 +133,4 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-let config = {
-  minZoom: 1,
-  maxZomm: 18,
-};
-
-const zoom = 10;
-const lat = 52.22977;
-const lng = 21.01178;
-
-const map = L.map('map', config).setView([lat, lng], zoom);
-
-// Used to load and display tile layers on the map
-// Most tile servers require attribution, which you can set under `Layer`
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution:
-    '',
-}).addTo(map);
 
