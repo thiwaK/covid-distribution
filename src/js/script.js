@@ -5,14 +5,14 @@ let config = {
   maxZomm: 20,
   zoomControl: false,
 
-  zoom: 7,
+  zoom: 8,
   lat: 7.8731,
   lng: 80.7718,
 };
 const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
 
-// Load map layers
-let defualtLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Load map tile layers
+let openStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '',
   maxZoom: 20,
 });
@@ -33,13 +33,21 @@ let ESRI = L.tileLayer(
   attribution: '',
   maxZoom: 20,
 });
-
-
+var clean = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+});
+var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+});
 
 
 let baseMaps = {
-  "Default" : defualtLayer,
-  "ESRI" : ESRI,
+  "Clean" : clean,
+  "Dark" : dark,
+  "OpenStreet" : openStreet,
+  "ESRI Satellite" : ESRI,
   "Google Street" : googleStreet,
   "Google Satellite" : googleSat,
 };
@@ -47,7 +55,7 @@ let baseMaps = {
 
 
 L.control.layers(baseMaps).addTo(map);
-defualtLayer.addTo(map);
+dark.addTo(map);
 
 var markersLayer = new L.LayerGroup();
 var controlSearch = new L.Control.Search({
@@ -68,7 +76,7 @@ var newSearchControl = new L.Control.Search({
   autoCollapse: true,
   minLength: 2,
   zoom:10,
-  text: 'Search...',
+  text: 'Search',
   textCancel: 'Cancel',
   textErr: 'Not found'
 });
