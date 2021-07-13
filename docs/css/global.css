@@ -605,4 +605,12 @@ small + small {
 
 .container-modify{
   background-color:transparent;
-} 
+}
+
+body {
+  margin: 0;
+}
+
+html, body, #leaflet {
+  height: 100%;
+}

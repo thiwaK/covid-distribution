@@ -1,22 +1,40 @@
 
-
+// Initalize the map
 let config = {
   minZoom: 1,
-  maxZomm: 18,
+  maxZomm: 20,
+
+  zoom: 7,
+  lat: 7.8731,
+  lng: 80.7718,
 };
+const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
 
-const zoom = 2;
-const lat = 0;
-const lng = 0;
+// Load map layers
+let defualtLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '',
+});
 
-const map = L.map('map', config).setView([lat, lng], zoom);
+let googleStreet = googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&language=en-US',{
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3']
+});
 
-// Used to load and display tile layers on the map
-// Most tile servers require attribution, which you can set under `Layer`
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution:
-    '',
-}).addTo(map);
+let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&language=en-US',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+let googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&language=en-US',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+let ESRI = L.tileLayer(
+  'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: '',
+  maxZoom: 18,
+  }).addTo(map);
 
 window.addEventListener('DOMContentLoaded', function () {
   // Autocomplete
@@ -134,3 +152,12 @@ window.addEventListener('DOMContentLoaded', function () {
 });
 
 
+let baseMaps = {
+  "Default" : defualtLayer,
+  "ESRI" : ESRI,
+  "Google Street" : googleStreet,
+  "Google Satellite" : googleSat,
+};
+
+L.control.layers(baseMaps).addTo(map);
+defualtLayer.addTo(map);
