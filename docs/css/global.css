@@ -603,9 +603,6 @@ small + small {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
 }
 
-.container-modify{
-  background-color:transparent;
-}
 
 body {
   margin: 0;
