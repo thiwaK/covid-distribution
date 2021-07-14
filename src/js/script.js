@@ -12,6 +12,7 @@ let config = {
 const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
 
 // Load map tile layers
+
 let openStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '',
     maxZoom: 20,
@@ -33,6 +34,11 @@ let ESRI = L.tileLayer(
     attribution: '',
     maxZoom: 20,
 });
+var CartoDB_Voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+	subdomains: 'abcd',
+	maxZoom: 19
+});
 var clean = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
     maxZoom: 20,
     attribution: ''
@@ -51,7 +57,7 @@ var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{
 // };
 // L.control.layers(baseMaps).addTo(map);
 
-clean.addTo(map);
+CartoDB_Voyager.addTo(map);
 
 var markersLayer = new L.LayerGroup();
 var controlSearch = new L.Control.Search({
