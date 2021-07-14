@@ -51,7 +51,7 @@ var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{
 // };
 // L.control.layers(baseMaps).addTo(map);
 
-clean.addTo(map);
+openStreet.addTo(map);
 
 var markersLayer = new L.LayerGroup();
 var controlSearch = new L.Control.Search({
