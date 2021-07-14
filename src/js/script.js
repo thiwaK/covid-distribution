@@ -35,27 +35,23 @@ let ESRI = L.tileLayer(
 });
 var clean = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
 	maxZoom: 20,
-	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+	attribution: ''
 });
 var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
 	maxZoom: 20,
-	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+	attribution: ''
 });
+// let baseMaps = {
+//   "Clean" : clean,
+//   "Dark" : dark,
+//   "OpenStreet" : openStreet,
+//   "ESRI Satellite" : ESRI,
+//   "Google Street" : googleStreet,
+//   "Google Satellite" : googleSat,
+// };
+// L.control.layers(baseMaps).addTo(map);
 
-
-let baseMaps = {
-  "Clean" : clean,
-  "Dark" : dark,
-  "OpenStreet" : openStreet,
-  "ESRI Satellite" : ESRI,
-  "Google Street" : googleStreet,
-  "Google Satellite" : googleSat,
-};
-
-
-
-L.control.layers(baseMaps).addTo(map);
-dark.addTo(map);
+clean.addTo(map);
 
 var markersLayer = new L.LayerGroup();
 var controlSearch = new L.Control.Search({
