@@ -134,6 +134,20 @@ Http.onloadend = (e) =>{
     if(obj.patients[item].lat >= 0){
       if(obj.patients[item].lng >= 0){
         pationt.push({"lat":parseFloat(obj.patients[item].lat) , "lng":parseFloat(obj.patients[item].lng), count: 1}); 
+
+        var circleCenter = [obj.patients[item].lat, obj.patients[item].lng];
+        var circleOptions = {
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: .4
+        }
+        var circle = L.circle(circleCenter, 50, circleOptions);
+        circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received + 
+        "<br/><b>Latitiude </b>" + obj.patients[item].lat + 
+        "<br/><b>Longitiude </b>" + obj.patients[item].lng);
+        circle.addTo(map);
+
+
       }
     }
 
@@ -146,19 +160,12 @@ Http.onloadend = (e) =>{
   
   var heatmapLayer = new HeatmapOverlay(cfg);
   heatmapLayer.setData(testData);
-  map.addLayer(heatmapLayer);
+  //map.addLayer(heatmapLayer);
+
+  
 
 };
 
-
-
-
-
-
-// var testData = {
-//   "max": 999999999,
-//   "data": pationt,
-// };
 
 
 
@@ -173,4 +180,13 @@ Http.onloadend = (e) =>{
 // circle.addTo(map);
 
 
+// var popup = L.popup();
 
+// function onMapClick(e) {
+//     popup
+//         .setLatLng(e.latlng)
+//         .setContent("You clicked the map at " + e.latlng.toString())
+//         .openOn(map);
+// }
+
+// map.on('click', onMapClick);
