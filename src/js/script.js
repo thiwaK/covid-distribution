@@ -198,8 +198,21 @@ function loadCVS(){
   const url_3='/src/countries.csv';
   Http_3.open("GET", url_3);
   Http_3.send();
+ 
   Http_3.onloadend = (e) =>{
-    processData(Http_3.responseText);
+    if(Http_3.status == 404){
+      url_3='/covid-distribution/src/countries.csv';
+      Http_3.open("GET", url_3);
+      Http_3.send();
+
+      Http_3.onloadend = (e) =>{
+        processData(Http_3.responseText);
+      }
+
+    }
+    else{
+      processData(Http_3.responseText);
+    }
   }
   
 }
@@ -251,6 +264,8 @@ function loadWorldSummary(dataBundle){
           fillOpacity: .4,
           weight: .5
         }
+
+
         
 
         let circleSize = obj.Countries[item].TotalConfirmed%200000;
