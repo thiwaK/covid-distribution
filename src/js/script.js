@@ -194,8 +194,8 @@ function loadSLCovid(){
 
 function loadCVS(){
 
-  const Http_3 = new XMLHttpRequest();
-  const url_3='/src/countries.csv';
+  let Http_3 = new XMLHttpRequest();
+  let url_3='/src/countries.csv';
   Http_3.open("GET", url_3);
   Http_3.send();
  
