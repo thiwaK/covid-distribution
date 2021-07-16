@@ -1,18 +1,4 @@
-
-// Initalize the map
-let config = {
-  minZoom: 1,
-  maxZomm: 20,
-  zoomControl: false,
-
-  zoom: 8,
-  lat: 7.8731,
-  lng: 80.7718,
-};
-const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
-
-// Load map tile layers
-
+// map tile layers
 let openStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '',
     maxZoom: 20,
@@ -47,57 +33,22 @@ var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{
     maxZoom: 20,
     attribution: ''
 });
-// let baseMaps = {
-//   "Clean" : clean,
-//   "Dark" : dark,
-//   "OpenStreet" : openStreet,
-//   "ESRI Satellite" : ESRI,
-//   "Google Street" : googleStreet,
-//   "Google Satellite" : googleSat,
-// };
-// L.control.layers(baseMaps).addTo(map);
 
-CartoDB_Voyager.addTo(map);
+// Configurations
+let config = {
+  minZoom: 2,
+  maxZomm: 20,
+  zoomControl: false,
 
-var markersLayer = new L.LayerGroup();
-var controlSearch = new L.Control.Search({
-  position:'topleft',		
-  layer: markersLayer,
-  initial: false,
-  zoom: 12,
-  marker: false
-});
+  zoom: 3,
+  lat: 15,
+  lng: 0,
 
-var newSearchControl = new L.Control.Search({
-  url: 'https://nominatim.openstreetmap.org/search?format=json&accept-language=de-DE&q={s}',
-  jsonpParam: 'json_callback',
-  propertyName: 'display_name',
-  propertyLoc: ['lat','lon'],
-  markerLocation: true,
-  autoType: false,
-  autoCollapse: true,
-  minLength: 2,
-  zoom:10,
-  text: 'Search',
-  textCancel: 'Cancel',
-  textErr: 'Not found'
-});
+  // zoom: 8,
+  // lat: 7.8731,
+  // lng: 80.7718,
+};
 
-map.addControl(newSearchControl);
-L.control.zoom({position: 'topleft'}).addTo(map);
-
-// map.attributionControl.setPrefix(false);
-// map.dragging.enable();
-// map.touchZoom.enable();
-// map.doubleClickZoom.enable();
-// map.scrollWheelZoom.enable();
-
-const Http = new XMLHttpRequest();
-const url='https://nhss.gov.lk/api/suwapetha/getPatientData/covid';
-Http.open("POST", url);
-Http.send();
-
-let pationt = [];
 var cfg = {
   // radius should be small ONLY if scaleRadius is true (or small radius is intended)
   // if scaleRadius is false it will be the constant radius used in pixels
@@ -117,55 +68,248 @@ var cfg = {
   valueField: 'count'
 };
 
-Http.onreadystatechange = (e) => {
-  // packet by packet
-};
+function setAdditionalConfig(){
+  map.attributionControl.setPrefix(false);
+  map.dragging.enable();
+  map.touchZoom.enable();
+  map.doubleClickZoom.enable();
+  map.scrollWheelZoom.enable();
+}
 
-Http.onloadend = (e) =>{
-  // whole packet
+function processData(allText) {
 
-  const obj = JSON.parse(Http.responseText);
-  console.log(obj.http_status);
+  var dataBundle = {
+    countryName:[],
+    lat:[],
+    lng:[]
+  };
 
-  for (let item in obj.patients) {
-    // console.log(obj.patients[item].Date_of_report_received);
-    // console.log(obj.patients[item].lat);
-    // console.log(obj.patients[item].lng);
-    if(obj.patients[item].lat >= 0){
-      if(obj.patients[item].lng >= 0){
-        pationt.push({"lat":parseFloat(obj.patients[item].lat) , "lng":parseFloat(obj.patients[item].lng), count: 1}); 
+  
+  var allTextLines = allText.split(/\r\n|\n/);
 
-        var circleCenter = [obj.patients[item].lat, obj.patients[item].lng];
-        var circleOptions = {
-          color: 'red',
-          fillColor: '#f03',
-          fillOpacity: .4
+  // var record_num = 6;  // or however many elements there are in each row
+  // var entries = allTextLines[0].split(',');
+  // var lines = [];
+  // var headings = entries.splice(0,record_num);
+  // while (entries.length>0) {
+  //     var tarr = [];
+  //     for (var j=0; j<record_num; j++) {
+  //         tarr.push(headings[j]+":"+entries.shift());
+  //     }
+  //     lines.push(tarr);
+  // }
+
+  var count = 1;
+  while (allTextLines.length != count){
+    // "Vanuatu", "VU", "VUT", "548", "-16", "167"
+    // console.log(allTextLines[count].split(',')[0]);
+    // dataBundle.countryCode[count] = allTextLines[count].split(',')[1];
+    var reg = /^[a-z]+$/i;
+    let countryCode = allTextLines[count].match(/\".+?\"/g)[0].replace("\"", "").replace("\"","");
+    // let countryCode2 = allTextLines[count].match(/\".+?\"/g)[2].replace("\"", "").replace("\"","");
+    let lat = allTextLines[count].match(/\".+?\"/g)[1].replace("\"", "").replace("\"","");
+    let lng = allTextLines[count].match(/\".+?\"/g)[2].replace("\"", "").replace("\"","");
+    let countryName = allTextLines[count].match(/\".+?\"/g)[3];
+
+    // console.log(lat,lng);
+
+    dataBundle.countryName[countryCode] = countryName;
+    dataBundle.lat[countryCode] = parseFloat(lat);
+    dataBundle.lng[countryCode] = parseFloat(lng);
+
+    
+    count += 1;
+  }
+  
+  loadWorldSummary(dataBundle);
+}
+
+function addAdditionalTileLayers(){
+  let baseMaps = {
+    "Clean" : clean,
+    "Dark" : dark,
+    "OpenStreet" : openStreet,
+    "ESRI Satellite" : ESRI,
+    "Google Street" : googleStreet,
+    "Google Satellite" : googleSat,
+  };
+  L.control.layers(baseMaps).addTo(map);
+}
+
+function loadSLCovid(){
+
+  const Http = new XMLHttpRequest();
+  const url='https://nhss.gov.lk/api/suwapetha/getPatientData/covid';
+  Http.open("POST", url);
+  Http.send();
+
+  let pationt = [];
+
+  Http.onreadystatechange = (e) => {
+    // packet by packet
+  };
+
+  Http.onloadend = (e) =>{
+    // whole packet
+
+    const obj = JSON.parse(Http.responseText);
+    console.log(obj.http_status);
+
+    for (let item in obj.patients) {
+      // console.log(obj.patients[item].Date_of_report_received);
+      // console.log(obj.patients[item].lat);
+      // console.log(obj.patients[item].lng);
+      if(obj.patients[item].lat >= 0){
+        if(obj.patients[item].lng >= 0){
+          pationt.push({"lat":parseFloat(obj.patients[item].lat) , "lng":parseFloat(obj.patients[item].lng), count: 1}); 
+
+          var circleCenter = [obj.patients[item].lat, obj.patients[item].lng];
+          var circleOptions = {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: .4
+          }
+          var circle = L.circle(circleCenter, 50, circleOptions);
+          circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received + 
+          "<br/><b>Latitiude </b>" + obj.patients[item].lat + 
+          "<br/><b>Longitiude </b>" + obj.patients[item].lng);
+          circle.addTo(map);
+
+
         }
-        var circle = L.circle(circleCenter, 50, circleOptions);
-        circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received + 
-        "<br/><b>Latitiude </b>" + obj.patients[item].lat + 
-        "<br/><b>Longitiude </b>" + obj.patients[item].lng);
-        circle.addTo(map);
+      }
+
+      
+    }
+
+    var testData = {
+      "data":pationt,
+    };
+    
+    var heatmapLayer = new HeatmapOverlay(cfg);
+    heatmapLayer.setData(testData);
+    //map.addLayer(heatmapLayer);
+  };
+}
+
+function loadCVS(){
+
+  const Http_3 = new XMLHttpRequest();
+  const url_3='/src/countries.csv';
+  Http_3.open("GET", url_3);
+  Http_3.send();
+  Http_3.onloadend = (e) =>{
+    processData(Http_3.responseText);
+  }
+  
+}
 
 
+function loadWorldSummary(dataBundle){
+
+
+  const Http_2 = new XMLHttpRequest();
+  const url_2='https://api.covid19api.com/summary';
+  Http_2.open("GET", url_2);
+  Http_2.send();
+
+  Http_2.onloadend = (e) =>{
+
+    const obj = JSON.parse(Http_2.responseText);
+    let minCases = 2^53 - 1;
+    let maxCases = 0;
+
+    for (let item in obj.Countries){
+      if(obj.Countries[item].TotalConfirmed < minCases){
+        minCases = obj.Countries[item].TotalConfirmed;
+      }
+      if(obj.Countries[item].TotalConfirmed > maxCases){
+        maxCases = obj.Countries[item].TotalConfirmed;
       }
     }
 
+    let classWidth = parseInt((maxCases - minCases)/5)
+    console.log(minCases, maxCases, classWidth);
     
-  }
 
-  var testData = {
-    "data":pationt,
+    
+    for (let item in obj.Countries) {
+      
+      let lat = dataBundle["lat"][obj.Countries[item].CountryCode];
+      let lng = dataBundle["lng"][obj.Countries[item].CountryCode];
+
+      if (lat != undefined){
+        // console.log(obj.Countries[item].Country);
+        // console.log(dataBundle["lat"][obj.Countries[item].CountryCode]);
+        // console.log(dataBundle["lng"][obj.Countries[item].CountryCode]);
+
+
+        var circleCenter = [lat, lng];
+        var circleOptions = {
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: .4,
+          weight: .5
+        }
+        
+
+        let circleSize = obj.Countries[item].TotalConfirmed%200000;
+        var circle = L.circle(circleCenter, circleSize, circleOptions);
+        circle.addTo(map);
+      }
+    }
+
   };
-  
-  var heatmapLayer = new HeatmapOverlay(cfg);
-  heatmapLayer.setData(testData);
-  //map.addLayer(heatmapLayer);
+}
 
-  
+function loadWorldCovid(){
 
-};
+}
 
+
+// Initalize the map
+const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
+CartoDB_Voyager.addTo(map);
+
+// Search controler
+var markersLayer = new L.LayerGroup();
+var searchControl = new L.Control.Search({
+  position:'topleft',	
+  layer: markersLayer,
+  marker: false,
+  initial: false,
+  url: 'https://nominatim.openstreetmap.org/search?format=json&accept-language=de-DE&q={s}',
+  jsonpParam: 'json_callback',
+  propertyName: 'display_name',
+  propertyLoc: ['lat','lon'],
+  markerLocation: true,
+  autoType: false,
+  autoCollapse: true,
+  minLength: 2,
+  zoom:10,
+  text: 'Search',
+  textCancel: 'Cancel',
+  textErr: 'Not found'
+});
+map.addControl(searchControl);
+L.control.zoom({position: 'topleft'}).addTo(map);
+
+
+
+// let Countries = [];
+// let CountryCode = [];
+// let TotalConfirmed = [];
+// let TotalDeaths = [];
+// let TotalRecovered = [];
+// let Date = [];
+
+// let NewConfirmed = [];
+// let NewDeaths = [];
+// let NewRecovered = [];
+
+
+
+loadCVS();
 
 
 
