@@ -41,7 +41,7 @@ let config = {
   zoomControl: false,
 
   zoom: 3,
-  lat: 15,
+  lat: 18,
   lng: 15,
 
   // zoom: 8,
