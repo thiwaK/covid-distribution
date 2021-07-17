@@ -361,7 +361,7 @@ function worldDataSource2(){
 
   var today = new Date();
   var yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
+  yesterday.setDate(today.getDate() - 2);
 
   var dd = String(yesterday.getDate()).padStart(2, '0');
   var mm = String(yesterday.getMonth() + 1).padStart(2, '0');
@@ -410,10 +410,11 @@ function worldDataSource2(){
           dataBundle.Recovered.push(rowArray[9]);
           dataBundle.Active.push(rowArray[10]);
 
-          console.log(rowArray[5], rowArray[6]);
+          // console.log(rowArray[5], rowArray[6]);
           // console.log(dataBundle["lat"][obj.Countries[item].CountryCode]);
           // console.log(dataBundle["lng"][obj.Countries[item].CountryCode]);
   
+
           var circleCenter = [rowArray[5], rowArray[6]];
           var circleOptions = {
             color: 'red',
@@ -425,11 +426,40 @@ function worldDataSource2(){
           let circleSize = rowArray[7]/20;
           var circle = L.circle(circleCenter, circleSize, circleOptions);
 
+          circle.on('click', function(e){
+            console.log(e);
+            console.log(e.target._popup._content)
+          });
+
+
           if(rowArray[2] == ""){
-            circle.bindPopup("<b>" + rowArray[3] + "</b>");
+            circle.bindPopup(
+              "<div id=\"popupTable\"><table>" +
+              "<tr><th colspan=2>" + rowArray[3] + "</th></tr>" +
+              "<tr><td>🏥 Confirmed</td><td>" + rowArray[7] + "</td></tr>" +
+              "<tr><td>🟢 Active</td><td>" + rowArray[10] + "</td></tr>" +
+              "<tr><td>🩹 Recovered</td><td>" + rowArray[9] + "</td></tr>" +
+              "<tr><td>💀 Deaths</td><td>" + rowArray[8] + "</td></tr>" +
+              "</table></div>"
+            );
           }else{
-            circle.bindPopup("<b>" + rowArray[2] + "</b> - " + rowArray[3]);
+            circle.bindPopup(
+              "<div id=\"popupTable\"><table>" +
+              "<tr><th colspan=2>" + rowArray[3] + " - " + rowArray[2] +  "</th></tr>" +
+              "<tr><td>🏥 Confirmed</td><td>" + rowArray[7] + "</td></tr>" +
+              "<tr><td>🟢 Active</td><td>" + rowArray[10] + "</td></tr>" +
+              "<tr><td>🩹 Recovered</td><td>" + rowArray[9] + "</td></tr>" +
+              "<tr><td>💀 Deaths</td><td>" + rowArray[8] + "</td></tr>" +
+              "</table></div>"
+            );
           }
+
+          // circle.bindPopup(
+          //   "🏥 Confirmed : " + rowArray[7] + 
+          //   "</br>💀 Deaths : " + rowArray[8] + 
+          //   "</br>🩹 Recovered : " + rowArray[9] +
+          //   "</br>🟢 Active : " + rowArray[10]
+          // );
 
           
           circle.addTo(map);
@@ -557,7 +587,6 @@ map.on("zoomend", function (e) {
   if(map.getCenter().lng > 79.5 & map.getCenter().lng < 82){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
       if(e.target._zoom >= 7){
-        alert("Now you can see SL data only");
         loadSLCovid();
       }
       
@@ -576,7 +605,6 @@ map.on("moveend", function (e) {
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
 
       if(e.target._zoom >= 7){
-        alert("Now you can see SL data only");
         loadSLCovid();
       }
     }
@@ -586,20 +614,26 @@ map.on("moveend", function (e) {
 messegeBoxFunctionality();
 var options = { timeout: 5000 }
 var box = L.control.messagebox(options).addTo(map);
-// let Countries = [];
-// let CountryCode = [];
-// let TotalConfirmed = [];
-// let TotalDeaths = [];
-// let TotalRecovered = [];
-// let Date = [];
 
-// let NewConfirmed = [];
-// let NewDeaths = [];
-// let NewRecovered = [];
+// BOX
+var info = L.control();
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'infoMy'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+    this._div.innerHTML = '<div><canvas id="myChart"></canvas></div>';
+};
+//info.addTo(map);
 
 
 
 let bulk = worldDataSource2();
+
+
+
 
 
 
@@ -624,8 +658,6 @@ let bulk = worldDataSource2();
 // }
 
 // map.on('click', onMapClick);
-
-
 
 
 
