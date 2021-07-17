@@ -42,7 +42,7 @@ let config = {
 
   zoom: 3,
   lat: 15,
-  lng: 0,
+  lng: 15,
 
   // zoom: 8,
   // lat: 7.8731,
@@ -268,7 +268,7 @@ function loadWorldSummary(dataBundle){
 
         
 
-        let circleSize = obj.Countries[item].TotalConfirmed%200000;
+        let circleSize = obj.Countries[item].TotalConfirmed/40;
         var circle = L.circle(circleCenter, circleSize, circleOptions);
         circle.addTo(map);
       }
@@ -277,9 +277,6 @@ function loadWorldSummary(dataBundle){
   };
 }
 
-function loadWorldCovid(){
-
-}
 
 
 // Initalize the map
@@ -308,6 +305,15 @@ var searchControl = new L.Control.Search({
 });
 map.addControl(searchControl);
 L.control.zoom({position: 'topleft'}).addTo(map);
+
+
+// Zoom level change listener
+map.on("zoomstart", function (e) { console.log("ZOOMSTART", e); });
+map.on("zoomend", function (e) { 
+  console.log("ZOOMEND", e); 
+  console.log("ZOOMEND", e.type); 
+  console.log("ZOOMEND", e.target._zoom); 
+});
 
 
 
