@@ -527,7 +527,7 @@ function updateLocationOfCircles(){
       weight: .5
     }
 
-    let circleSize = dataBundle.Confirmed[count]/20;
+    let circleSize = dataBundle.Confirmed[count]/40;
     console.log(circleSize);
     var circle = L.circle(circleCenter, circleSize, circleOptions);
 
@@ -572,6 +572,7 @@ function updateLocationOfCircles(){
 
 function circleClick(e) {
  
+  document.getElementById("info-pane").style.display = 'block';
 
   var clickedCircle = e.target;
   clickedCircle.closePopup();
@@ -580,20 +581,24 @@ function circleClick(e) {
   const obj = JSON.parse(clickedCircle._popup._content);
   console.log(obj);
 
+  //chart.data.datasets[0].data = [obj[1], obj[2], obj[3], obj[4]];
+  // chart.data.datasets[0].data[0] = obj.data[1];
+  
+  // chart.data.datasets[0].data[0] = obj.data[1];
+  // chart.data.datasets[0].data[1] = obj.data[2];
+  // chart.data.datasets[0].data[2] = obj.data[3];
+  // chart.data.datasets[0].data[3] = obj.data[4];
 
-  chart.data.datasets[0].data = [obj[1],obj[2],obj[3],obj[4]];
+  chart.data.datasets[0].data[0] = obj.data[2];
+  chart.data.datasets[0].data[1] = obj.data[3];
+  chart.data.datasets[0].data[2] = obj.data[4];
+
+  console.log(obj.data[1],obj.data[2]+obj.data[3]+obj.data[4]);
+  chart.options.title.text = obj.data[0];
+  chart.options.elements.center.text = obj.data[1];
   chart.update();
 }
 
-function updateChart () {
-  // reformat the features' attributes of interest into
-  // the data array format required by the Chart.js scatterplot
-  var scatterPlotDataArray = [];
-  
-
-  // finally, instruct the chart to re-draw itself with the new data
-  
-}
 
 // Initalize the map
 const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
@@ -632,6 +637,7 @@ map.on("zoomstart", function (e) {
   // console.log("ZOOMSTART", e);
   // console.log("ZOOMEND", e.target._zoom); 
   // zoomConfig.previous = e.target._zoom;
+  document.getElementById("info-pane").style.display = 'none';
 });
 map.on("zoomend", function (e) { 
 
@@ -652,6 +658,9 @@ map.on("zoomend", function (e) {
 
 });
 map.on("moveend", function (e) {
+
+  
+  document.getElementById("info-pane").style.display = 'none';
 
   if(map.getCenter().lng > 79.5 & map.getCenter().lng < 82){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
