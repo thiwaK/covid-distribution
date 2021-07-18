@@ -18,8 +18,8 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <style>
       .chart-container {
-        height: 245px;
-        width: 245px;
+        height: 200px;
+        width: 200px;
       }
     
       #info-pane {
@@ -27,8 +27,8 @@
         top: 10px;
         right: 10px;
         z-index: 400;
-        padding: 1em;
-        background: white;
+        padding-bottom: 15px;
+        background: rgba(255, 255, 255, 0.404);
       }
     </style>
   </head>
@@ -58,127 +58,54 @@
 
     <script>
      
-      // STEP 2: DEFINE A CHART
-      // this is a static scatterplot chart definition for now, but it will
-      // soon become dynamic by responding to map and feature layer events
-      var initialChartData = {
-        datasets: [{
-          label: 'Portland Heritage Trees',
-          // the data values are empty at this moment
-          // and will be updated dynamically below
-          data: []
-        }]
-      };
-    
-      var chartOptions = {
-        scales: {
-          xAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'tree diameter'
-            },
-            ticks: {
-              beginAtZero: true,
-              max: 250,
-              stepSize: 50
-            }
-          }],
-          yAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'tree height'
-            },
-            ticks: {
-              beginAtZero: true,
-              max: 250,
-              stepSize: 50
-            }
+      var chart = new Chart('chartCanvas', {
+        type: 'doughnut',
+        data: {
+          labels: ['Reported', 'Active', 'Recoverd', 'Death'],
+          datasets: [{
+            label: '# of Tomatoes',
+            data: [12, 19, 3, 5],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)'
+            ],
+            borderColor: [
+              'rgba(255,99,132,1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 1
           }]
         },
-        maintainAspectRatio: false,
-        // turn off animations during chart data updates
-        animation: {
-          duration: 0
-        },
-        // see STEP 4 below
-        onHover: handleChartHover
-      };
-    
-      var chart = new Chart('chartCanvas', {
-        type: 'scatter',
-        data: initialChartData,
-        options: chartOptions
-      });
-    
-      // STEP 3: MAKE THE CHART DYNAMIC BY ESTABLISHING MAP-TO-CHART COMMUNICATION
-      // show in the scatterplot only the features in the map's current extent
-      // by handling several events from both the map and feature layer
-      map.on('zoom move', updateChart);
-      treesFeatureLayer.on('load', updateChart);
-    
-      function updateChart () {
-        // reformat the features' attributes of interest into
-        // the data array format required by the Chart.js scatterplot
-        var scatterPlotDataArray = [];
-    
-        treesFeatureLayer.eachActiveFeature(function (e) {
-          // loop over each active feature in the map extent and
-          // push an object into the scatterPlotDataArray in this format:
-    
-          // {
-          //   x: diameter attribute value,
-          //   y: height attribute value,
-          //   featureId: unique ID for chart-to-map communication in STEP 4
-          // }
-    
-          scatterPlotDataArray.push({
-            x: e.feature.properties.DIAMETER,
-            y: e.feature.properties.HEIGHT,
-            featureId: e.feature.id
-          });
-        });
-    
-        // assign the new scatterPlotDataArray to the chart's data property
-        chart.data.datasets[0].data = scatterPlotDataArray;
-    
-        // finally, instruct the chart to re-draw itself with the new data
-        chart.update();
-      }
-    
-      // STEP 4 (OPTIONAL): ESTABLISH CHART-TO-MAP COMMUNICATION
-      // up until now the map and feature layer inform the chart what to render,
-      // but interactions with the chart can also influence the map contents
-      function handleChartHover (e) {
-        var chartHoverData = chart.getElementsAtEvent(e);
-    
-        if (!chartHoverData.length) {
-          // if there were no data elements found when hovering over the chart,
-          // reset any previous styling overrides and return
-          treesFeatureLayer.eachFeature(function (e) {
-            e.setOpacity(1);
-            e.setZIndexOffset(0);
-          });
-    
-          return;
-        }
-    
-        // otherwise, bring attention to the features on the map
-        // that are currently being hovered over in the chart
-        var hoverFeatureIds = chartHoverData.map(function (datum) {
-          return chart.data.datasets[0].data[datum._index].featureId;
-        });
-    
-        treesFeatureLayer.eachFeature(function (e, idx) {
-          if (
-            hoverFeatureIds.indexOf(e.feature.id) > -1
-          ) {
-            e.setOpacity(1);
-            e.setZIndexOffset(10000);
-          } else {
-            e.setOpacity(0.1);
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            display: false
+          },
+          tooltips: {
+            enabled: true
+          },
+          title: {
+            display: true,
+            text: 'Summary'
           }
-        });
-      }
+        }
+      });
+      // chart.canvas.parentNode.style.height = '180px';
+      // chart.canvas.parentNode.style.width = '180px';
+  
+      map.on('zoom move', updateChart);
+      CartoDB_Voyager.on('load', updateChart);
+    
+      
+    
+
+      
+      
     </script>
  
   </body>

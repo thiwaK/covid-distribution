@@ -69,6 +69,17 @@ var cfg = {
   valueField: 'count'
 };
 
+var dataBundle = {
+  countryName:[],
+  lastUpdate:[],
+  lat:[],
+  lng:[],
+  Confirmed:[],
+  Deaths:[],
+  Recovered:[],
+  Active:[]
+};
+
 function messegeBoxFunctionality(){
   L.Control.Messagebox = L.Control.extend({
     options: {
@@ -375,17 +386,8 @@ function worldDataSource2(){
   Http.open("GET", url);
   Http.send();
 
-  var dataBundle = {
-    countryName:[],
-    lastUpdate:[],
-    lat:[],
-    lng:[],
-    Confirmed:[],
-    Deaths:[],
-    Recovered:[],
-    Active:[]
-  };
   
+
   Http.onloadend = (e) =>{
       
     var allText = Http.responseText;
@@ -401,7 +403,22 @@ function worldDataSource2(){
       if(rowArray[2] == "" || rowArray[2] != ""){  // skip privince_state filter      
         if (rowArray[5] != undefined || rowArray[6] != undefined){
           
-          dataBundle.countryName.push(rowArray[3]);
+          // if(dataBundle.countryName.includes(rowArray[3])){
+          //     const position = dataBundle.countryName.indexOf(rowArray[3]);
+          //     dataBundle.Confirmed[position] += rowArray[7];
+          //     dataBundle.Deaths[position] += rowArray[8];
+          //     dataBundle.Recovered[position] += rowArray[9];
+          //     dataBundle.Active[position] += rowArray[10];
+          // }else{
+          //   dataBundle.countryName.push(rowArray[3]);
+          //   dataBundle.lastUpdate.push(rowArray[4]);
+          //   dataBundle.lat.push(rowArray[5]);
+          //   dataBundle.lng.push(rowArray[6]);
+          //   dataBundle.Confirmed.push(rowArray[7]);
+          //   dataBundle.Deaths.push(rowArray[8]);
+          //   dataBundle.Recovered.push(rowArray[9]);
+          //   dataBundle.Active.push(rowArray[10]);
+          
           dataBundle.lastUpdate.push(rowArray[4]);
           dataBundle.lat.push(rowArray[5]);
           dataBundle.lng.push(rowArray[6]);
@@ -410,69 +427,23 @@ function worldDataSource2(){
           dataBundle.Recovered.push(rowArray[9]);
           dataBundle.Active.push(rowArray[10]);
 
-          // console.log(rowArray[5], rowArray[6]);
-          // console.log(dataBundle["lat"][obj.Countries[item].CountryCode]);
-          // console.log(dataBundle["lng"][obj.Countries[item].CountryCode]);
-  
-
-          var circleCenter = [rowArray[5], rowArray[6]];
-          var circleOptions = {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: .4,
-            weight: .5
-          }
-
-          let circleSize = rowArray[7]/20;
-          var circle = L.circle(circleCenter, circleSize, circleOptions);
-
-          circle.on('click', function(e){
-            console.log(e);
-            console.log(e.target._popup._content)
-          });
-
-
           if(rowArray[2] == ""){
-            circle.bindPopup(
-              "<div id=\"popupTable\"><table>" +
-              "<tr><th colspan=2>" + rowArray[3] + "</th></tr>" +
-              "<tr><td>🏥 Confirmed</td><td>" + rowArray[7] + "</td></tr>" +
-              "<tr><td>🟢 Active</td><td>" + rowArray[10] + "</td></tr>" +
-              "<tr><td>🩹 Recovered</td><td>" + rowArray[9] + "</td></tr>" +
-              "<tr><td>💀 Deaths</td><td>" + rowArray[8] + "</td></tr>" +
-              "</table></div>"
-            );
+            dataBundle.countryName.push(rowArray[3]);
           }else{
-            circle.bindPopup(
-              "<div id=\"popupTable\"><table>" +
-              "<tr><th colspan=2>" + rowArray[3] + " - " + rowArray[2] +  "</th></tr>" +
-              "<tr><td>🏥 Confirmed</td><td>" + rowArray[7] + "</td></tr>" +
-              "<tr><td>🟢 Active</td><td>" + rowArray[10] + "</td></tr>" +
-              "<tr><td>🩹 Recovered</td><td>" + rowArray[9] + "</td></tr>" +
-              "<tr><td>💀 Deaths</td><td>" + rowArray[8] + "</td></tr>" +
-              "</table></div>"
-            );
+            dataBundle.countryName.push(rowArray[3] + " - " + rowArray[2]);
           }
-
-          // circle.bindPopup(
-          //   "🏥 Confirmed : " + rowArray[7] + 
-          //   "</br>💀 Deaths : " + rowArray[8] + 
-          //   "</br>🩹 Recovered : " + rowArray[9] +
-          //   "</br>🟢 Active : " + rowArray[10]
-          // );
-
-          
-          circle.addTo(map);
         }
-        
-
 
       }
-              
+       
       count += 1;
     }
-    
+
+    updateLocationOfCircles();
+
   };
+
+  
   
   return dataBundle;
 }
@@ -542,7 +513,87 @@ function loadWorldSummary(dataBundle){
   };
 }
 
+function updateLocationOfCircles(){
+  count = 0;
+  while (dataBundle.countryName.length != count){
 
+    console.log(dataBundle.countryName[count]);
+
+    var circleCenter = [dataBundle.lat[count], dataBundle.lng[count]];
+    var circleOptions = {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: .4,
+      weight: .5
+    }
+
+    let circleSize = dataBundle.Confirmed[count]/20;
+    console.log(circleSize);
+    var circle = L.circle(circleCenter, circleSize, circleOptions);
+
+    // circle.on('click', function(e){
+    //   console.log(e);
+    //   console.log(e.target._popup._content)
+    // });
+
+
+
+    // circle.bindPopup(
+    //   "<div id=\"popupTable\"><table>" +
+    //   "<tr><th colspan=2>" + dataBundle.countryName[count] + "</th></tr>" +
+    //   "<tr><td>🏥 Confirmed</td><td>" + dataBundle.Confirmed[count] + "</td></tr>" +
+    //   "<tr><td>🟢 Active</td><td>" + dataBundle.Active[count] + "</td></tr>" +
+    //   "<tr><td>🩹 Recovered</td><td>" + dataBundle.Recovered[count] + "</td></tr>" +
+    //   "<tr><td>💀 Deaths</td><td>" + dataBundle.Deaths[count] + "</td></tr>" +
+    //   "</table></div>"
+    // );
+
+    circle.bindPopup(
+      "{ \"data\": [\"" + 
+      dataBundle.countryName[count] + "\"," + 
+      dataBundle.Confirmed[count] + "," + 
+      dataBundle.Active[count] + "," +
+      dataBundle.Recovered[count] + "," +
+      dataBundle.Deaths[count] + "]}"
+    );
+    
+    circle.on("click", circleClick);
+
+    
+
+
+    circle.addTo(map);
+
+    
+
+    count += 1;
+  }
+}
+
+function circleClick(e) {
+ 
+
+  var clickedCircle = e.target;
+  clickedCircle.closePopup();
+  
+  console.log(clickedCircle._popup._content);
+  const obj = JSON.parse(clickedCircle._popup._content);
+  console.log(obj);
+
+
+  chart.data.datasets[0].data = [obj[1],obj[2],obj[3],obj[4]];
+  chart.update();
+}
+
+function updateChart () {
+  // reformat the features' attributes of interest into
+  // the data array format required by the Chart.js scatterplot
+  var scatterPlotDataArray = [];
+  
+
+  // finally, instruct the chart to re-draw itself with the new data
+  
+}
 
 // Initalize the map
 const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
@@ -583,6 +634,7 @@ map.on("zoomstart", function (e) {
   // zoomConfig.previous = e.target._zoom;
 });
 map.on("zoomend", function (e) { 
+
   
   if(map.getCenter().lng > 79.5 & map.getCenter().lng < 82){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
