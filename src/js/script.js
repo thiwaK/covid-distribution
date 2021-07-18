@@ -269,6 +269,7 @@ function processData(allText) {
   loadWorldSummary(dataBundle);
 }
 
+
 function addAdditionalTileLayers(){
   let baseMaps = {
     "Clean" : clean,
@@ -281,10 +282,10 @@ function addAdditionalTileLayers(){
   L.control.layers(baseMaps).addTo(map);
 }
 
-let isLoaded = false;
+
 function loadSLCovid(){
 
-  if(isLoaded == flase){
+
     
     const Http = new XMLHttpRequest();
     const url='https://nhss.gov.lk/api/suwapetha/getPatientData/covid';
@@ -292,6 +293,8 @@ function loadSLCovid(){
     Http.send();
 
     let pationt = [];
+
+    isLoaded = true;
 
     Http.onreadystatechange = (e) => {
       // packet by packet
@@ -321,7 +324,9 @@ function loadSLCovid(){
             circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received + 
             "<br/><b>Latitiude </b>" + obj.patients[item].lat + 
             "<br/><b>Longitiude </b>" + obj.patients[item].lng);
-            circle.addTo(map);
+
+            circlesArraySL.push(circle);
+            //circle.addTo(map);
 
 
           }
@@ -334,12 +339,15 @@ function loadSLCovid(){
         "data":pationt,
       };
       
+      slDotLayer = L.layerGroup(circlesArraySL);
+      
+
       var heatmapLayer = new HeatmapOverlay(cfg);
       heatmapLayer.setData(testData);
       //map.addLayer(heatmapLayer);
-      isLoaded = true;
+      
     };
-  }
+  
 }
 
 function loadWorldData(){
@@ -513,11 +521,15 @@ function loadWorldSummary(dataBundle){
   };
 }
 
+let circlesArray =[];
+let circlesArraySL =[];
+var circlesWorld = L.layerGroup;
+var slDotLayer = L.layerGroup;
 function updateLocationOfCircles(){
   count = 0;
   while (dataBundle.countryName.length != count){
 
-    console.log(dataBundle.countryName[count]);
+    // console.log(dataBundle.countryName[count]);
 
     var circleCenter = [dataBundle.lat[count], dataBundle.lng[count]];
     var circleOptions = {
@@ -528,7 +540,7 @@ function updateLocationOfCircles(){
     }
 
     let circleSize = dataBundle.Confirmed[count]/40;
-    console.log(circleSize);
+    // console.log(circleSize);
     var circle = L.circle(circleCenter, circleSize, circleOptions);
 
     // circle.on('click', function(e){
@@ -560,14 +572,16 @@ function updateLocationOfCircles(){
     circle.on("click", circleClick);
 
     
+    circlesArray.push(circle);
 
-
-    circle.addTo(map);
+    //circle.addTo(map);
 
     
 
     count += 1;
   }
+  circlesWorld = L.layerGroup(circlesArray);
+  circlesWorld.addTo(map);
 }
 
 function circleClick(e) {
@@ -577,9 +591,7 @@ function circleClick(e) {
   var clickedCircle = e.target;
   clickedCircle.closePopup();
   
-  console.log(clickedCircle._popup._content);
   const obj = JSON.parse(clickedCircle._popup._content);
-  console.log(obj);
 
   //chart.data.datasets[0].data = [obj[1], obj[2], obj[3], obj[4]];
   // chart.data.datasets[0].data[0] = obj.data[1];
@@ -593,7 +605,6 @@ function circleClick(e) {
   chart.data.datasets[0].data[1] = obj.data[3];
   chart.data.datasets[0].data[2] = obj.data[4];
 
-  console.log(obj.data[1],obj.data[2]+obj.data[3]+obj.data[4]);
   chart.options.title.text = obj.data[0];
   chart.options.elements.center.text = obj.data[1];
   chart.update();
@@ -640,36 +651,59 @@ map.on("zoomstart", function (e) {
   document.getElementById("info-pane").style.display = 'none';
 });
 map.on("zoomend", function (e) { 
-
-  
-  if(map.getCenter().lng > 79.5 & map.getCenter().lng < 82){
+  if(map.getCenter().lng > 79 & map.getCenter().lng < 83){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
       if(e.target._zoom >= 7){
-        loadSLCovid();
+        map.removeLayer(circlesWorld);
+        slDotLayer.addTo(map);
+      }else{
+        map.removeLayer(slDotLayer);
+        circlesWorld.addTo(map);
       }
       
+    }else{
+      map.removeLayer(slDotLayer);
+      circlesWorld.addTo(map);
     }
 
-    console.log("ZOOMEND", e); 
-    console.log("ZOOMEND", e.type); 
-    zoomConfig.current = e.target._zoom;
-
+  }else{
+    map.removeLayer(slDotLayer);
+    circlesWorld.addTo(map);
   }
 
 });
 map.on("moveend", function (e) {
-
-  
-  document.getElementById("info-pane").style.display = 'none';
-
-  if(map.getCenter().lng > 79.5 & map.getCenter().lng < 82){
+  if(map.getCenter().lng > 79 & map.getCenter().lng < 83){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
-
       if(e.target._zoom >= 7){
-        loadSLCovid();
+        map.removeLayer(circlesWorld);
+        slDotLayer.addTo(map);
+      }else{
+        map.removeLayer(slDotLayer);
+        circlesWorld.addTo(map);
       }
+      
+    }else{
+      map.removeLayer(slDotLayer);
+      circlesWorld.addTo(map);
     }
+
+  }else{
+    map.removeLayer(slDotLayer);
+    circlesWorld.addTo(map);
   }
+});
+map.on('click', function(e) {        
+  
+  console.log(e);
+  if(e.type == "click"){
+    document.getElementById("info-pane").style.display = 'none';
+  }
+  // var popLocation= e.latlng;
+  // var popup = L.popup()
+  // .setLatLng(popLocation)
+  // .setContent('<p>Hello world!<br />This is a nice popup.</p>')
+  // .openOn(map);        
 });
 
 messegeBoxFunctionality();
@@ -687,38 +721,10 @@ info.onAdd = function (map) {
 info.update = function (props) {
     this._div.innerHTML = '<div><canvas id="myChart"></canvas></div>';
 };
-//info.addTo(map);
+// info.addTo(map);
 
 
 
 let bulk = worldDataSource2();
-
-
-
-
-
-
-//L.marker([7.8731, 80.7710]).addTo(map);
-// var circleCenter = [config.lat, config.lng];
-// var circleOptions = {
-//   color: 'red',
-//   fillColor: '#f03',
-//   fillOpacity: .2
-// }
-// var circle = L.circle(circleCenter, 500, circleOptions);
-// circle.addTo(map);
-
-
-// var popup = L.popup();
-
-// function onMapClick(e) {
-//     popup
-//         .setLatLng(e.latlng)
-//         .setContent("You clicked the map at " + e.latlng.toString())
-//         .openOn(map);
-// }
-
-// map.on('click', onMapClick);
-
-
+loadSLCovid();
 
