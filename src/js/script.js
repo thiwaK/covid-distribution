@@ -372,6 +372,7 @@ function loadWorldData(){
   
 }
 
+
 function worldDataSource2(datesBack){
   // https://corona.lmao.ninja/v2/countries?yesterday&sort
 
@@ -429,19 +430,87 @@ function worldDataSource2(datesBack){
             //   dataBundle.Recovered.push(rowArray[9]);
             //   dataBundle.Active.push(rowArray[10]);
             
-            dataBundle.lastUpdate.push(rowArray[4]);
-            dataBundle.lat.push(rowArray[5]);
-            dataBundle.lng.push(rowArray[6]);
-            dataBundle.Confirmed.push(rowArray[7]);
-            dataBundle.Deaths.push(rowArray[8]);
-            dataBundle.Recovered.push(rowArray[9]);
-            dataBundle.Active.push(rowArray[10]);
+            // dataBundle.lastUpdate.push(rowArray[4]);
+            // dataBundle.lat.push(rowArray[5]);
+            // dataBundle.lng.push(rowArray[6]);
+            // dataBundle.Confirmed.push(rowArray[7]);
+            // dataBundle.Deaths.push(rowArray[8]);
+            // dataBundle.Recovered.push(rowArray[9]);
+            // dataBundle.Active.push(rowArray[10]);
 
-            if(rowArray[2] == ""){
+            // if(rowArray[2].trim() == ""){
+            //   dataBundle.countryName.push(rowArray[3]);
+            // }else{
+            //   let position = multiplePoints.country.indexOf(rowArray[3]);
+            //   if(position != -1){
+            //     multiplePoints.confirmed[position] += parseInt(rowArray[7]);
+            //     multiplePoints.death[position] += parseInt(rowArray[8]);
+            //   }else{
+            //     multiplePoints.country.push(rowArray[3]);
+            //     multiplePoints.confirmed.push(parseInt(rowArray[7]));
+            //     multiplePoints.death.push(parseInt(rowArray[8]));
+            //   }
+
+            //   console.log(rowArray[3] + " - " + rowArray[2]);
+            //   dataBundle.countryName.push(rowArray[3] + " - " + rowArray[2]);
+            // }
+
+            
+
+            if(rowArray[2].trim() == ""){
               dataBundle.countryName.push(rowArray[3]);
+              dataBundle.lastUpdate.push(rowArray[4]);
+              dataBundle.lat.push(rowArray[5]);
+              dataBundle.lng.push(rowArray[6]);
+              dataBundle.Confirmed.push(parseInt(rowArray[7]));
+              dataBundle.Deaths.push(parseInt(rowArray[8]));
+              dataBundle.Recovered.push(parseInt(rowArray[9]));
+              dataBundle.Active.push(parseInt(rowArray[10]));
             }else{
-              dataBundle.countryName.push(rowArray[3] + " - " + rowArray[2]);
+              let position = dataBundle.countryName.indexOf(rowArray[3]);
+              if(position != -1){
+                
+                if(parseInt(rowArray[7]) >= 0){
+                  dataBundle.Confirmed[position] += parseInt(rowArray[7]);
+                } 
+                if(parseInt(rowArray[8]) >= 0 ){
+                  dataBundle.Deaths[position] += parseInt(rowArray[8]);
+                } 
+                if(parseInt(rowArray[9]) >= 0 ){
+                  dataBundle.Recovered[position] += parseInt(rowArray[9]);
+                } 
+                if(parseInt(rowArray[10]) >= 0 ){
+                  dataBundle.Active[position] += parseInt(rowArray[10]);
+                } 
+              }else{
+                if(parseInt(rowArray[7]) >= 0){
+                  dataBundle.Confirmed.push(parseInt(rowArray[7]));
+                } else{dataBundle.Confirmed.push(0)} 
+                
+                if(parseInt(rowArray[8]) >= 0 ){
+                  dataBundle.Deaths.push(parseInt(rowArray[8]));
+                } else{dataBundle.Deaths.push(0)} 
+                
+                if(parseInt(rowArray[9]) >= 0 ){
+                  dataBundle.Recovered.push(parseInt(rowArray[9]));
+                } else{dataBundle.Recovered.push(0)} 
+                
+                if(parseInt(rowArray[10]) >= 0 ){
+                  dataBundle.Active.push(parseInt(rowArray[10]));
+                } else{dataBundle.Active.push(0)} 
+
+                dataBundle.countryName.push(rowArray[3]);
+                dataBundle.lastUpdate.push(rowArray[4]);
+                dataBundle.lat.push(rowArray[5]);
+                dataBundle.lng.push(rowArray[6]);
+
+              }
+              console.log(rowArray[7], rowArray[8], rowArray[9], rowArray[10]);
+              // console.log(rowArray[3] + " - " + rowArray[2]);
+
             }
+
+
           }
 
         }
@@ -455,6 +524,57 @@ function worldDataSource2(datesBack){
      
 
     
+
+  };
+
+  
+  
+  return dataBundle;
+}
+
+
+function worldDataSource3(){
+    
+  const Http = new XMLHttpRequest();
+  let url='https://corona.lmao.ninja/v2/countries?yesterday&sort';
+  Http.open("GET", url);
+  Http.send();
+
+  Http.onloadend = (e) =>{
+
+
+    var allText ="";
+    if(Http.status != 200){
+      worldDataSource2(1);
+    
+    }else{
+      allText = Http.responseText;
+
+      const obj = JSON.parse(allText);
+
+      var count = 0;
+      while (obj.length != count){
+
+    
+        dataBundle.countryName.push(obj[count].country);
+        dataBundle.lastUpdate.push(obj[count]);
+        dataBundle.lat.push(obj[count].countryInfo.lat);
+        dataBundle.lng.push(obj[count].countryInfo.long);
+        dataBundle.Confirmed.push(parseInt(obj[count].cases));
+        dataBundle.Deaths.push(parseInt(obj[count].deaths));
+        dataBundle.Recovered.push(parseInt(obj[count].recovered));
+        dataBundle.Active.push(parseInt(obj[count].active));
+           
+                
+        // console.log(rowArray[7], rowArray[8], rowArray[9], rowArray[10]);
+        // console.log(rowArray[3] + " - " + rowArray[2]);
+
+
+        count += 1;
+      }
+
+      updateLocationOfCircles();
+    }
 
   };
 
@@ -648,11 +768,6 @@ map.addControl(searchControl);
 L.control.zoom({position: 'topleft'}).addTo(map);
 
 
-// Zoom level change listener
-let zoomConfig= {
-  previous:0,
-  current:0
-}
 map.on("zoomstart", function (e) { 
   // console.log("ZOOMSTART", e);
   // console.log("ZOOMEND", e.target._zoom); 
@@ -734,7 +849,7 @@ info.update = function (props) {
 
 
 
-let bulk = worldDataSource2(0);
-loadSLCovid();
+// let bulk = worldDataSource2(1);
+// loadSLCovid();
 
-
+worldDataSource3();
