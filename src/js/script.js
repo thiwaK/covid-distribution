@@ -133,10 +133,7 @@ function setAdditionalConfig(){
   map.scrollWheelZoom.enable();
 }
 
-// ref: http://stackoverflow.com/a/1293163/2343
-// This will parse a delimited string into an array of
-// arrays. The default delimiter is the comma, but this
-// can be overriden in the second argument.
+
 function CSVToArray( strData, strDelimiter ){
   // Check to see if the delimiter is defined. If not,
   // then default to comma.
@@ -375,12 +372,12 @@ function loadWorldData(){
   
 }
 
-function worldDataSource2(){
+function worldDataSource2(datesBack){
   // https://corona.lmao.ninja/v2/countries?yesterday&sort
 
   var today = new Date();
   var yesterday = new Date();
-  yesterday.setDate(today.getDate() - 2);
+  yesterday.setDate(today.getDate() - datesBack);
 
   var dd = String(yesterday.getDate()).padStart(2, '0');
   var mm = String(yesterday.getMonth() + 1).padStart(2, '0');
@@ -390,64 +387,74 @@ function worldDataSource2(){
 
     
   const Http = new XMLHttpRequest();
-  const url='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/'+_date_+'.csv';
+  let url='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/'+_date_+'.csv';
   Http.open("GET", url);
   Http.send();
 
   
 
   Http.onloadend = (e) =>{
-      
-    var allText = Http.responseText;
 
-    var allTextLines = CSVToArray(allText)
-    var count = 1;
 
-    while (allTextLines.length != count){
+    var allText ="";
+    if(Http.status != 200){
+      worldDataSource2(datesBack + 1);
+    
+    }else{
+      allText = Http.responseText;
+      var allTextLines = CSVToArray(allText)
+      var count = 1;
 
-      let rowArray = allTextLines[count];
-      // FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incident_Rate,Case_Fatality_Ratio
+      while (allTextLines.length != count){
 
-      if(rowArray[2] == "" || rowArray[2] != ""){  // skip privince_state filter      
-        if (rowArray[5] != undefined || rowArray[6] != undefined){
-          
-          // if(dataBundle.countryName.includes(rowArray[3])){
-          //     const position = dataBundle.countryName.indexOf(rowArray[3]);
-          //     dataBundle.Confirmed[position] += rowArray[7];
-          //     dataBundle.Deaths[position] += rowArray[8];
-          //     dataBundle.Recovered[position] += rowArray[9];
-          //     dataBundle.Active[position] += rowArray[10];
-          // }else{
-          //   dataBundle.countryName.push(rowArray[3]);
-          //   dataBundle.lastUpdate.push(rowArray[4]);
-          //   dataBundle.lat.push(rowArray[5]);
-          //   dataBundle.lng.push(rowArray[6]);
-          //   dataBundle.Confirmed.push(rowArray[7]);
-          //   dataBundle.Deaths.push(rowArray[8]);
-          //   dataBundle.Recovered.push(rowArray[9]);
-          //   dataBundle.Active.push(rowArray[10]);
-          
-          dataBundle.lastUpdate.push(rowArray[4]);
-          dataBundle.lat.push(rowArray[5]);
-          dataBundle.lng.push(rowArray[6]);
-          dataBundle.Confirmed.push(rowArray[7]);
-          dataBundle.Deaths.push(rowArray[8]);
-          dataBundle.Recovered.push(rowArray[9]);
-          dataBundle.Active.push(rowArray[10]);
+        let rowArray = allTextLines[count];
+        // FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incident_Rate,Case_Fatality_Ratio
 
-          if(rowArray[2] == ""){
-            dataBundle.countryName.push(rowArray[3]);
-          }else{
-            dataBundle.countryName.push(rowArray[3] + " - " + rowArray[2]);
+        if(rowArray[2] == "" || rowArray[2] != ""){  // skip privince_state filter      
+          if (rowArray[5] != undefined || rowArray[6] != undefined){
+            
+            // if(dataBundle.countryName.includes(rowArray[3])){
+            //     const position = dataBundle.countryName.indexOf(rowArray[3]);
+            //     dataBundle.Confirmed[position] += rowArray[7];
+            //     dataBundle.Deaths[position] += rowArray[8];
+            //     dataBundle.Recovered[position] += rowArray[9];
+            //     dataBundle.Active[position] += rowArray[10];
+            // }else{
+            //   dataBundle.countryName.push(rowArray[3]);
+            //   dataBundle.lastUpdate.push(rowArray[4]);
+            //   dataBundle.lat.push(rowArray[5]);
+            //   dataBundle.lng.push(rowArray[6]);
+            //   dataBundle.Confirmed.push(rowArray[7]);
+            //   dataBundle.Deaths.push(rowArray[8]);
+            //   dataBundle.Recovered.push(rowArray[9]);
+            //   dataBundle.Active.push(rowArray[10]);
+            
+            dataBundle.lastUpdate.push(rowArray[4]);
+            dataBundle.lat.push(rowArray[5]);
+            dataBundle.lng.push(rowArray[6]);
+            dataBundle.Confirmed.push(rowArray[7]);
+            dataBundle.Deaths.push(rowArray[8]);
+            dataBundle.Recovered.push(rowArray[9]);
+            dataBundle.Active.push(rowArray[10]);
+
+            if(rowArray[2] == ""){
+              dataBundle.countryName.push(rowArray[3]);
+            }else{
+              dataBundle.countryName.push(rowArray[3] + " - " + rowArray[2]);
+            }
           }
+
         }
-
+        
+        count += 1;
       }
-       
-      count += 1;
-    }
 
-    updateLocationOfCircles();
+      updateLocationOfCircles();
+    }
+      
+     
+
+    
 
   };
 
@@ -727,7 +734,7 @@ info.update = function (props) {
 
 
 
-let bulk = worldDataSource2();
+let bulk = worldDataSource2(0);
 loadSLCovid();
 
 
