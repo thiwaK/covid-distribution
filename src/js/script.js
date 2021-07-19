@@ -582,6 +582,7 @@ function updateLocationOfCircles(){
   }
   circlesWorld = L.layerGroup(circlesArray);
   circlesWorld.addTo(map);
+  
 }
 
 function circleClick(e) {
@@ -607,6 +608,7 @@ function circleClick(e) {
 
   chart.options.title.text = obj.data[0];
   chart.options.elements.center.text = obj.data[1];
+  chart.options.legend.labels.boxWidth = 5;
   chart.update();
 }
 
@@ -727,4 +729,5 @@ info.update = function (props) {
 
 let bulk = worldDataSource2();
 loadSLCovid();
+
 
