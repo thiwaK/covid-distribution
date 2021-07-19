@@ -742,6 +742,7 @@ function circleClick(e) {
 
 // Initalize the map
 const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
+// CartoDB_Voyager.addTo(map);
 CartoDB_Voyager.addTo(map);
 
 // Search controler
