@@ -850,6 +850,7 @@ info.update = function (props) {
 
 
 // let bulk = worldDataSource2(1);
-// loadSLCovid();
-
 worldDataSource3();
+loadSLCovid();
+
+
