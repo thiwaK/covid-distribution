@@ -1,12 +1,13 @@
 
 # __COVID-19 Distribution Map__
 
-# Goto [Live map]
 
-## _Powered By_
+_Powered By_
 <img width="600" src="https://rawgit.com/Leaflet/Leaflet/master/src/images/logo.svg" alt="Leaflet" />
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+
+[Live map]
 
 
 ## Features
