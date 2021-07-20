@@ -7,6 +7,8 @@ _Powered By_
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
+<img width="600" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png" alt="Map">
+
 [Live map]
 
 Give a ⭐️ if you like this project!
