@@ -301,7 +301,7 @@ function loadSLCovid(){
       // whole packet
 
       const obj = JSON.parse(Http.responseText);
-      console.log(obj.http_status);
+      // console.log(obj.http_status);
 
       for (let item in obj.patients) {
         // console.log(obj.patients[item].Date_of_report_received);
