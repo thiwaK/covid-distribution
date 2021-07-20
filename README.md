@@ -6,10 +6,11 @@ _Powered By_
 <img width="600" src="https://rawgit.com/Leaflet/Leaflet/master/src/images/logo.svg" alt="Leaflet" />
 
 
+<p align="center">
+  <img width="460" height="700" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png">
+</p>
 
-<img align="center" width="600" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png" alt="Map">
-<span style="display:block;text-align:center">![]https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png)</span>
-
+<p></p>
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
