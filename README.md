@@ -5,9 +5,13 @@
 _Powered By_
 <img width="600" src="https://rawgit.com/Leaflet/Leaflet/master/src/images/logo.svg" alt="Leaflet" />
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-<img width="600" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png" alt="Map">
+
+<img align="center" width="600" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png" alt="Map">
+<span style="display:block;text-align:center">![]https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png)</span>
+
+
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 [Live map]
 
