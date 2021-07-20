@@ -3,7 +3,7 @@
 
 
 _Powered By_
-<img width="600" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/d58bc7bfd66e56cb2ca4ae17e83b610d00a69ea8/src/images/leaflet.png" alt="Leaflet" />
+<img width="600" src="https://rawgit.com/Leaflet/Leaflet/master/src/images/logo.svg" alt="Leaflet" />
 </br></br>
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
