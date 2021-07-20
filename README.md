@@ -7,7 +7,7 @@ _Powered By_
 
 
 <p align="center">
-  <img width="460" height="700" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png">
+  <img width="700" src="https://raw.githubusercontent.com/thiwaK/covid-distribution/main/src/images/Screenshot-1.png">
 </p>
 
 <p></p>
