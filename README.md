@@ -4,12 +4,12 @@
 
 _Powered By_
 <img width="600" src="https://rawgit.com/Leaflet/Leaflet/master/src/images/logo.svg" alt="Leaflet" />
-</br></br>
+
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 [Live map]
 
-
+Give a ⭐️ if you like this project!
 ## Features
 
 - Country specific summary
@@ -25,7 +25,7 @@ _Powered By_
 - [chartjs-plugin-labels] - Modify default lable styles in chart.js
 - [leaflet-search] - Simple search box for leaflet
 
-## Development
+## 🤝 Contribute
 
 Want to contribute? Great!
 
@@ -45,15 +45,15 @@ Start the server and edit what you want. Server runs at following address
 127.0.0.1:5500
 ```
 
-## License
+## 📝 License
 
-MIT
+This project is MIT licensed.
 
 **Free Software, Hell Yeah!**
 
 
-   [Chart.js]: <https://www.chartjs.org/>
-   [Leaflet.js]: <https://leafletjs.com/>
-   [chartjs-plugin-labels]: <https://github.com/emn178/chartjs-plugin-labels>
-   [leaflet-search]:<https://github.com/stefanocudini/leaflet-search>
-   [Live map]:<https://thiwak.github.io/covid-distribution/>
+[Chart.js]: <https://www.chartjs.org/>
+[Leaflet.js]: <https://leafletjs.com/>
+[chartjs-plugin-labels]: <https://github.com/emn178/chartjs-plugin-labels>
+[leaflet-search]:<https://github.com/stefanocudini/leaflet-search>
+[Live map]:<https://thiwak.github.io/covid-distribution/>
