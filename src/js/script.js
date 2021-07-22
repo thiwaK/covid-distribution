@@ -778,7 +778,7 @@ map.on("zoomstart", function (e) {
 map.on("zoomend", function (e) { 
   if(map.getCenter().lng > 79 & map.getCenter().lng < 83){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
-      if(e.target._zoom >= 7){
+      if(e.target._zoom >= 9){
         map.removeLayer(circlesWorld);
         slDotLayer.addTo(map);
       }else{
@@ -800,7 +800,7 @@ map.on("zoomend", function (e) {
 map.on("moveend", function (e) {
   if(map.getCenter().lng > 79 & map.getCenter().lng < 83){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
-      if(e.target._zoom >= 7){
+      if(e.target._zoom >= 9){
         map.removeLayer(circlesWorld);
         slDotLayer.addTo(map);
       }else{
