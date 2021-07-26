@@ -49,7 +49,6 @@ let config = {
   // lat: 7.8731,
   // lng: 80.7718,
 };
-
 var cfg = {
   // radius should be small ONLY if scaleRadius is true (or small radius is intended)
   // if scaleRadius is false it will be the constant radius used in pixels
@@ -68,7 +67,6 @@ var cfg = {
   // which field name in your data represents the data value - default "value"
   valueField: 'count'
 };
-
 var dataBundle = {
   countryName:[],
   lastUpdate:[],
@@ -79,6 +77,7 @@ var dataBundle = {
   Recovered:[],
   Active:[]
 };
+let current_zoom_level =1;
 
 function messegeBoxFunctionality(){
   L.Control.Messagebox = L.Control.extend({
@@ -742,8 +741,13 @@ function circleClick(e) {
 
 // Initalize the map
 const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
+var southWest = L.latLng(-89.98155760646617, -180),
+northEast = L.latLng(89.99346179538875, 180);
+var bounds = L.latLngBounds(southWest, northEast);
+map.setMaxBounds(bounds);
 // CartoDB_Voyager.addTo(map);
 CartoDB_Voyager.addTo(map);
+L.control.scale().addTo(map);
 
 // Search controler
 var markersLayer = new L.LayerGroup();
@@ -752,7 +756,7 @@ var searchControl = new L.Control.Search({
   layer: markersLayer,
   marker: false,
   initial: false,
-  url: 'https://nominatim.openstreetmap.org/search?format=json&accept-language=de-DE&q={s}',
+  url: 'https://nominatim.openstreetmap.org/search?format=json&accept-language=en-US&q={s}',
   jsonpParam: 'json_callback',
   propertyName: 'display_name',
   propertyLoc: ['lat','lon'],
@@ -760,7 +764,7 @@ var searchControl = new L.Control.Search({
   autoType: false,
   autoCollapse: true,
   minLength: 2,
-  zoom:10,
+  zoom:9,
   text: 'Search',
   textCancel: 'Cancel',
   textErr: 'Not found'
@@ -773,6 +777,7 @@ map.on("zoomstart", function (e) {
   // console.log("ZOOMSTART", e);
   // console.log("ZOOMEND", e.target._zoom); 
   // zoomConfig.previous = e.target._zoom;
+  current_zoom_level = e.target._zoom;
   document.getElementById("info-pane").style.display = 'none';
 });
 map.on("zoomend", function (e) { 
@@ -798,6 +803,7 @@ map.on("zoomend", function (e) {
 
 });
 map.on("moveend", function (e) {
+  current_zoom_level = e.target._zoom;
   if(map.getCenter().lng > 79 & map.getCenter().lng < 83){
     if(map.getCenter().lat > 6 & map.getCenter().lat < 10){
       if(e.target._zoom >= 9){
