@@ -1,55 +1,52 @@
-// map tile layers
-let openStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+// Configuration Obj --------------------------------------------------------------
+let tileLayer ={
+  cartoDBVoyager : L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+	  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+	  maxZoom: 19
+  }),
+  openStreet:L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '',
     maxZoom: 20,
-});
-let googleStreet = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&language=en-US',{
+  }),
+  googleStreet:L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&language=en-US',{
     maxZoom: 20,
     subdomains: ['mt0','mt1','mt2','mt3']
-});
-let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&language=en-US',{
-    maxZoom: 20,
-    subdomains:['mt0','mt1','mt2','mt3']
-});
-let googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&language=en-US',{
-    maxZoom: 20,
-    subdomains:['mt0','mt1','mt2','mt3']
-});
-let ESRI = L.tileLayer(
-    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '',
-    maxZoom: 20,
-});
-var CartoDB_Voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-	subdomains: 'abcd',
-	maxZoom: 19
-});
-var clean = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-    maxZoom: 20,
-    attribution: ''
-});
-var dark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-    maxZoom: 20,
-    attribution: ''
-});
+  }),
+  googleSat:L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&language=en-US',{
+      maxZoom: 20,
+      subdomains:['mt0','mt1','mt2','mt3']
+  }),
+  googleTerrain:L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&language=en-US',{
+      maxZoom: 20,
+      subdomains:['mt0','mt1','mt2','mt3']
+  }),
+  ESRI:L.tileLayer(
+      'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '',
+      maxZoom: 20,
+  }),
+  clean:L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20,
+      attribution: ''
+  }),
+  dark:L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20,
+      attribution: ''
+  }),
 
-// Configurations
-let config = {
+}
+let majorMapConfig = {
   minZoom: 2,
   maxZomm: 20,
   zoomControl: false,
   'messagebox': true,
-
   zoom: 3,
   lat: 18,
   lng: 15,
-
-  // zoom: 8,
-  // lat: 7.8731,
-  // lng: 80.7718,
 };
-var cfg = {
+var heatmapOverlayConfig = {
   // radius should be small ONLY if scaleRadius is true (or small radius is intended)
   // if scaleRadius is false it will be the constant radius used in pixels
   "radius": .01,
@@ -77,8 +74,33 @@ var dataBundle = {
   Recovered:[],
   Active:[]
 };
-let current_zoom_level =1;
+var searchControl = new L.Control.Search({
+  position:'topleft',	
+  layer: markersLayer,
+  url: 'https://nominatim.openstreetmap.org/search?format=json&accept-language=en-US&q={s}',
+  jsonpParam: 'json_callback',
+  propertyName: 'display_name',
+  propertyLoc: ['lat','lon'],
+  animateLocation: true,		//animate a circle over location found
+  circleLocation: false,		//draw a circle in location found
+  markerLocation: true,		//draw a marker in location found
+  minLength: 2,
+  zoom: 9,
+  text: 'Search',
+  textCancel: 'Cancel',
+  textErr: 'Not found',
+  // map.setView([0, 0], 0);
+})
 
+// Variables ----------------------------------------------------------------------
+let current_zoom_level = 1;
+let circlesArrayWorld = [];
+let circlesArraySL = [];
+var circlesWorld = L.layerGroup;
+var slDotLayer = L.layerGroup;
+var markersLayer = new L.LayerGroup();
+
+// Secondary Functions ------------------------------------------------------------
 function messegeBoxFunctionality(){
   L.Control.Messagebox = L.Control.extend({
     options: {
@@ -123,22 +145,28 @@ function messegeBoxFunctionality(){
     return new L.Control.Messagebox(options);
   };
 }
-
-function setAdditionalConfig(){
+function additionalMapConfig(){
   map.attributionControl.setPrefix(false);
   map.dragging.enable();
   map.touchZoom.enable();
   map.doubleClickZoom.enable();
   map.scrollWheelZoom.enable();
 }
+function addAdditionalTileLayers(){
+  let baseMaps = {
+    "Clean" : clean,
+    "Dark" : dark,
+    "OpenStreet" : openStreet,
+    "ESRI Satellite" : ESRI,
+    "Google Street" : googleStreet,
+    "Google Satellite" : googleSat,
+  };
+  L.control.layers(baseMaps).addTo(map);
+}
 
-
-function CSVToArray( strData, strDelimiter ){
-  // Check to see if the delimiter is defined. If not,
-  // then default to comma.
+// Primary Functions
+function CSVToArray(strData, strDelimiter){
   strDelimiter = (strDelimiter || ",");
-
-  // Create a regular expression to parse the CSV values.
   var objPattern = new RegExp(
       (
           // Delimiters.
@@ -224,41 +252,23 @@ function processData(allText) {
     lat:[],
     lng:[]
   };
-
-  
   var allTextLines = allText.split(/\r\n|\n/);
-
-  // var record_num = 6;  // or however many elements there are in each row
-  // var entries = allTextLines[0].split(',');
-  // var lines = [];
-  // var headings = entries.splice(0,record_num);
-  // while (entries.length>0) {
-  //     var tarr = [];
-  //     for (var j=0; j<record_num; j++) {
-  //         tarr.push(headings[j]+":"+entries.shift());
-  //     }
-  //     lines.push(tarr);
-  // }
-
   var count = 1;
+
   while (allTextLines.length != count){
     // "Vanuatu", "VU", "VUT", "548", "-16", "167"
     // console.log(allTextLines[count].split(',')[0]);
     // dataBundle.countryCode[count] = allTextLines[count].split(',')[1];
-    var reg = /^[a-z]+$/i;
+    
     let countryCode = allTextLines[count].match(/\".+?\"/g)[0].replace("\"", "").replace("\"","");
-    // let countryCode2 = allTextLines[count].match(/\".+?\"/g)[2].replace("\"", "").replace("\"","");
     let lat = allTextLines[count].match(/\".+?\"/g)[1].replace("\"", "").replace("\"","");
     let lng = allTextLines[count].match(/\".+?\"/g)[2].replace("\"", "").replace("\"","");
     let countryName = allTextLines[count].match(/\".+?\"/g)[3];
-
-    // console.log(lat,lng);
 
     dataBundle.countryName[countryCode] = countryName;
     dataBundle.lat[countryCode] = parseFloat(lat);
     dataBundle.lng[countryCode] = parseFloat(lng);
 
-    
     count += 1;
   }
   
@@ -266,17 +276,6 @@ function processData(allText) {
 }
 
 
-function addAdditionalTileLayers(){
-  let baseMaps = {
-    "Clean" : clean,
-    "Dark" : dark,
-    "OpenStreet" : openStreet,
-    "ESRI Satellite" : ESRI,
-    "Google Street" : googleStreet,
-    "Google Satellite" : googleSat,
-  };
-  L.control.layers(baseMaps).addTo(map);
-}
 
 
 function loadSLCovid(){
@@ -338,7 +337,7 @@ function loadSLCovid(){
       slDotLayer = L.layerGroup(circlesArraySL);
       
 
-      var heatmapLayer = new HeatmapOverlay(cfg);
+      var heatmapLayer = new HeatmapOverlay(heatmapOverlayConfig);
       heatmapLayer.setData(testData);
       //map.addLayer(heatmapLayer);
       
@@ -647,10 +646,7 @@ function loadWorldSummary(dataBundle){
   };
 }
 
-let circlesArray =[];
-let circlesArraySL =[];
-var circlesWorld = L.layerGroup;
-var slDotLayer = L.layerGroup;
+
 function updateLocationOfCircles(){
   count = 0;
   while (dataBundle.countryName.length != count){
@@ -698,7 +694,7 @@ function updateLocationOfCircles(){
     circle.on("click", circleClick);
 
     
-    circlesArray.push(circle);
+    circlesArrayWorld.push(circle);
 
     //circle.addTo(map);
 
@@ -706,7 +702,7 @@ function updateLocationOfCircles(){
 
     count += 1;
   }
-  circlesWorld = L.layerGroup(circlesArray);
+  circlesWorld = L.layerGroup(circlesArrayWorld);
   circlesWorld.addTo(map);
   
 }
@@ -740,44 +736,31 @@ function circleClick(e) {
 
 
 // Initalize the map
-const map = L.map('map', config).setView([config.lat, config.lng], config.zoom);
-var southWest = L.latLng(-89.98155760646617, -180),
-northEast = L.latLng(89.99346179538875, 180);
-var bounds = L.latLngBounds(southWest, northEast);
-map.setMaxBounds(bounds);
-// CartoDB_Voyager.addTo(map);
-CartoDB_Voyager.addTo(map);
+
+const map = L.map('map', majorMapConfig).setView([majorMapConfig.lat, majorMapConfig.lng], majorMapConfig.zoom);
+var southWest = L.latLng(-89.98155760646617, -180),northEast = L.latLng(89.99346179538875, 180);
+map.setMaxBounds(L.latLngBounds(southWest, northEast));
+tileLayer.cartoDBVoyager.addTo(map);
 L.control.scale().addTo(map);
 
-// Search controler
-var markersLayer = new L.LayerGroup();
-var searchControl = new L.Control.Search({
-  position:'topleft',	
-  layer: markersLayer,
-  marker: false,
-  initial: false,
-  url: 'https://nominatim.openstreetmap.org/search?format=json&accept-language=en-US&q={s}',
-  jsonpParam: 'json_callback',
-  propertyName: 'display_name',
-  propertyLoc: ['lat','lon'],
-  markerLocation: true,
-  autoType: false,
-  autoCollapse: true,
-  minLength: 2,
-  zoom:9,
-  text: 'Search',
-  textCancel: 'Cancel',
-  textErr: 'Not found'
-});
 map.addControl(searchControl);
 L.control.zoom({position: 'topleft'}).addTo(map);
 
+// Events
+searchControl.on('search_locationfound', function(e) {
+  console.log('search:locationfound');
 
+});
+searchControl.on('search_collapsed', function(e) {
+  console.log('search:collapsed');
+
+});
 map.on("zoomstart", function (e) { 
   // console.log("ZOOMSTART", e);
   // console.log("ZOOMEND", e.target._zoom); 
   // zoomConfig.previous = e.target._zoom;
   current_zoom_level = e.target._zoom;
+  
   document.getElementById("info-pane").style.display = 'none';
 });
 map.on("zoomend", function (e) { 
@@ -828,8 +811,11 @@ map.on('click', function(e) {
   
   console.log(e);
   if(e.type == "click"){
+    markersLayer.clearLayers();
     document.getElementById("info-pane").style.display = 'none';
   }
+
+  
   // var popLocation= e.latlng;
   // var popup = L.popup()
   // .setLatLng(popLocation)
@@ -838,8 +824,7 @@ map.on('click', function(e) {
 });
 
 messegeBoxFunctionality();
-var options = { timeout: 5000 }
-var box = L.control.messagebox(options).addTo(map);
+var box = L.control.messagebox({timeout:5000}).addTo(map);
 
 // BOX
 var info = L.control();
@@ -861,3 +846,7 @@ worldDataSource3();
 loadSLCovid();
 
 
+function init(){
+  
+}
+window.onload = init();

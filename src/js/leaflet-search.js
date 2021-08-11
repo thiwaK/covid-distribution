@@ -32,12 +32,12 @@
 			tooltipLimit: -1,			//limit max results to show in tooltip. -1 for no limit.
 			tipAutoSubmit: true,  		//auto map panTo when click on tooltip
 			autoResize: true,			//autoresize on input change
-			autoCollapse: false,		//collapse search control after submit(on button or on tips if enabled tipAutoSubmit)
+			autoCollapse: true,		//collapse search control after submit(on button or on tips if enabled tipAutoSubmit)
 			//TODO add option for persist markerLoc after collapse!
 			autoCollapseTime: 1200,		//delay for autoclosing alert and collapse after blur
 			animateLocation: true,		//animate a circle over location found
-			circleLocation: true,		//draw a circle in location found
-			markerLocation: false,		//draw a marker in location found
+			circleLocation: false,		//draw a circle in location found
+			markerLocation: true,		//draw a marker in location found
 			zoom: null,					//zoom after pan to location found, default: map.getZoom()
 			text: 'Search...',			//placeholder value	
 			textCancel: 'Cancel',		//title in cancel button
