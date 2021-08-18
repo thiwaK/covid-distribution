@@ -667,3 +667,34 @@ td {
   border:solid 1px #bbb;
   background-color:#f8f8f8;
 }
+
+
+/* custom control */
+.leaflet-control-command-interior
+{
+    background-image: url(../images/marker-icon.png)  no-repeat 4px 4px #fff;
+    width: 30px;
+    height: 30px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    display: block;
+    padding: 3px;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
+    cursor: auto;
+    text-align: center;
+    background-color: #FFFFFF;
+    display: block;
+    float: left;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+
+}
+
+.leaflet-control-command-interior:hover
+{
+    background-color: #F4F4F4;
+}
