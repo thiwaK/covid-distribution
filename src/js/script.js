@@ -277,10 +277,8 @@ function processData(allText) {
 
 
 
-
+var patitionGroup = L.featureGroup();
 function loadSLCovid() {
-
-
 
   const Http = new XMLHttpRequest();
   const url = 'https://nhss.gov.lk/api/suwapetha/getPatientData/covid';
@@ -288,6 +286,7 @@ function loadSLCovid() {
   Http.send();
 
   let pationt = [];
+  var pationtGroup = L.featureGroup();
 
   isLoaded = true;
 
@@ -316,13 +315,17 @@ function loadSLCovid() {
             fillOpacity: .4
           }
           var circle = L.circle(circleCenter, 50, circleOptions);
+
+          circle.on("click", function (e) {
+            console.log("HIT!");
+            slExtraInfo(obj.patients[item].lat, obj.patients[item].lng, e, circle);
+          });
+
           circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received +
             "<br/><b>Latitiude </b>" + obj.patients[item].lat +
             "<br/><b>Longitiude </b>" + obj.patients[item].lng);
 
           circlesArraySL.push(circle);
-          //circle.addTo(map);
-
 
         }
       }
@@ -330,18 +333,29 @@ function loadSLCovid() {
 
     }
 
+
     var testData = {
       "data": pationt,
     };
 
+
+
     slDotLayer = L.layerGroup(circlesArraySL);
 
+    L.circle([5.792, 80.738], 50, {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 4
+    }).addTo(pationtGroup);
+    pationtGroup.on("click", function (e) {
+      slExtraInfo(e)
+    }).addTo(map);
 
     var heatmapLayer = new HeatmapOverlay(heatmapOverlayConfig);
     heatmapLayer.setData(testData);
     //map.addLayer(heatmapLayer);
 
-  };
+  }
 
 }
 
@@ -734,6 +748,34 @@ function circleClick(e) {
   chart.update();
 }
 
+function slExtraInfo(context) {
+
+  const params = {
+    "id": 0,
+    "lat": context.latlng.lat,
+    "lng": context.latlng.lng,
+    "uid": 0
+  }
+
+
+  const http = new XMLHttpRequest();
+  const url = 'https://nhss.gov.lk/api/suwapetha/locationInfo';
+  http.open("POST", url, true);
+  http.setRequestHeader('Content-type', 'application/json;charset=utf-8');
+  http.setRequestHeader('User-Agent', 'okhttp/3.12.1');
+  http.setRequestHeader('Accept', 'application/json, text/plain, */*');
+  http.send(JSON.stringify(params));
+
+  http.onloadend = (e) => {
+
+    const obj = JSON.parse(http.responseText);
+
+    console.log(context);
+    var clickedCircle = context.layer;
+    clickedCircle.bindPopup(http.responseText).openPopup();
+
+  };
+}
 
 // Initalize the map
 
