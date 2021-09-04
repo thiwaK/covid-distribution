@@ -698,3 +698,23 @@ td {
 {
     background-color: #F4F4F4;
 }
+
+table {
+  border: 1px dashed #cccccc;
+  border-collapse: collapse;
+}
+
+
+th, td{
+  border: .5px dashed rgba(160, 31, 31, 0.288);
+  padding-top: 5;
+  padding-left: 5;
+  text-align: center;
+  vertical-align: middle;
+}
+
+tr {
+  border-bottom: 1px solid rgba(255, 0, 0, 0.253);
+  border-top: 1px solid rgba(255, 0, 0, 0.253);
+  border-collapse: collapse;
+}

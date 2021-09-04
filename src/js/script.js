@@ -310,16 +310,13 @@ function loadSLCovid() {
           }
           var circle = L.circle(circleCenter, 50, circleOptions);
 
-          circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received +
-            "<br/><b>Latitiude </b>" + obj.patients[item].lat +
-            "<br/><b>Longitiude </b>" + obj.patients[item].lng);
+          circle.bindPopup(obj.patients[item].Date_of_report_received);
 
           circle.addTo(patientFeatureGroup);
           circlesArraySL.push(circle);
 
         }
       }
-
 
     }
 
@@ -328,9 +325,6 @@ function loadSLCovid() {
       "data": pationt,
     };
 
-
-
-    // slDotLayer = L.layerGroup(circlesArraySL);
 
     patientFeatureGroup.on("click", function (e) {
       slExtraInfo(e)
@@ -733,6 +727,18 @@ function circleClick(e) {
   chart.update();
 }
 
+function isNoData(str) {
+  if (str == null) return true;
+  else {
+    try {
+      if (str.length < 2) return true
+      else return false
+    } catch (error) {
+      return true
+    }
+  }
+}
+
 function slExtraInfo(context) {
 
   const params = {
@@ -741,6 +747,8 @@ function slExtraInfo(context) {
     "lng": context.latlng.lng,
     "uid": 0
   }
+
+  console.log(context);
 
 
   const http = new XMLHttpRequest();
@@ -754,11 +762,43 @@ function slExtraInfo(context) {
   http.onloadend = (e) => {
 
     const obj = JSON.parse(http.responseText);
+    let popupString = "<table>";
 
-    console.log(context);
+    if (obj.http_status == "success") {
+
+
+      popupString += "<tr><td> Reported </td><td>" + context.layer._popup._content + "</td></tr>"
+      popupString += "<tr><td colspan=2>" + obj.location.province + " Province - " + obj.location.district + "</td></tr>"
+      popupString += "<tr><td> DSD </td><td>" + obj.location.dsd + "</td></tr>"
+      popupString += "<tr><td> GND </td><td>" + obj.location.gndName + "</td></tr>"
+      popupString += "<tr><td> MOH </td><td>" + obj.location.MOH + "</td></tr>"
+      if (isNoData(obj.location.PHI) == false) popupString += "<tr><td> PHI </td><td>" + obj.location.PHI + "</td></tr>"
+
+      popupString += "</table>"
+      // {
+      //   "http_status": "success",
+      //   "location": {
+      //     "gndName": "Bandirippuwa North",
+      //     "province": "North Western",
+      //     "district": "Puttalam",
+      //     "dsd": "Wennappuwa",
+      //     "MOH": "Dankotuwa MOH",
+      //     "PHI": " ",
+      //     "phi_officer_name": " ",
+      //     "phi_officer_mobile": null,
+      //     "moh_officer": " ",
+      //     "moh_tel": null,
+      //     "MOH_Tel": "312258178"
+      //   }
+      // }
+    }
+
+
+
     var clickedCircle = context.layer;
-    console.log(clickedCircle);
-    clickedCircle.bindPopup(http.responseText).openPopup();
+    clickedCircle.bindPopup(popupString).openPopup();
+
+
 
   };
 }
