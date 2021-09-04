@@ -97,8 +97,9 @@ let current_zoom_level = 1;
 let circlesArrayWorld = [];
 let circlesArraySL = [];
 var circlesWorld = L.layerGroup;
-var slDotLayer = L.layerGroup;
+// var slDotLayer = L.layerGroup;
 var markersLayer = new L.LayerGroup();
+var patientFeatureGroup = new L.featureGroup();
 
 // Secondary Functions ------------------------------------------------------------
 function messegeBoxFunctionality() {
@@ -277,7 +278,6 @@ function processData(allText) {
 
 
 
-var patitionGroup = L.featureGroup();
 function loadSLCovid() {
 
   const Http = new XMLHttpRequest();
@@ -286,13 +286,7 @@ function loadSLCovid() {
   Http.send();
 
   let pationt = [];
-  var pationtGroup = L.featureGroup();
-
   isLoaded = true;
-
-  Http.onreadystatechange = (e) => {
-    // packet by packet
-  };
 
   Http.onloadend = (e) => {
     // whole packet
@@ -316,15 +310,11 @@ function loadSLCovid() {
           }
           var circle = L.circle(circleCenter, 50, circleOptions);
 
-          circle.on("click", function (e) {
-            console.log("HIT!");
-            slExtraInfo(obj.patients[item].lat, obj.patients[item].lng, e, circle);
-          });
-
           circle.bindPopup("<b>Reported on </b>" + obj.patients[item].Date_of_report_received +
             "<br/><b>Latitiude </b>" + obj.patients[item].lat +
             "<br/><b>Longitiude </b>" + obj.patients[item].lng);
 
+          circle.addTo(patientFeatureGroup);
           circlesArraySL.push(circle);
 
         }
@@ -340,14 +330,9 @@ function loadSLCovid() {
 
 
 
-    slDotLayer = L.layerGroup(circlesArraySL);
+    // slDotLayer = L.layerGroup(circlesArraySL);
 
-    L.circle([5.792, 80.738], 50, {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 4
-    }).addTo(pationtGroup);
-    pationtGroup.on("click", function (e) {
+    patientFeatureGroup.on("click", function (e) {
       slExtraInfo(e)
     }).addTo(map);
 
@@ -772,6 +757,7 @@ function slExtraInfo(context) {
 
     console.log(context);
     var clickedCircle = context.layer;
+    console.log(clickedCircle);
     clickedCircle.bindPopup(http.responseText).openPopup();
 
   };
@@ -810,19 +796,19 @@ map.on("zoomend", function (e) {
     if (map.getCenter().lat > 6 & map.getCenter().lat < 10) {
       if (e.target._zoom >= 9) {
         map.removeLayer(circlesWorld);
-        slDotLayer.addTo(map);
+        // slDotLayer.addTo(map);
       } else {
-        map.removeLayer(slDotLayer);
+        // map.removeLayer(slDotLayer);
         circlesWorld.addTo(map);
       }
 
     } else {
-      map.removeLayer(slDotLayer);
+      // map.removeLayer(slDotLayer);
       circlesWorld.addTo(map);
     }
 
   } else {
-    map.removeLayer(slDotLayer);
+    // map.removeLayer(slDotLayer);
     circlesWorld.addTo(map);
   }
 
@@ -833,19 +819,19 @@ map.on("moveend", function (e) {
     if (map.getCenter().lat > 6 & map.getCenter().lat < 10) {
       if (e.target._zoom >= 9) {
         map.removeLayer(circlesWorld);
-        slDotLayer.addTo(map);
+        // slDotLayer.addTo(map);
       } else {
-        map.removeLayer(slDotLayer);
+        // map.removeLayer(slDotLayer);
         circlesWorld.addTo(map);
       }
 
     } else {
-      map.removeLayer(slDotLayer);
+      // map.removeLayer(slDotLayer);
       circlesWorld.addTo(map);
     }
 
   } else {
-    map.removeLayer(slDotLayer);
+    // map.removeLayer(slDotLayer);
     circlesWorld.addTo(map);
   }
 });
@@ -893,22 +879,22 @@ function init() {
 }
 window.onload = init();
 
-map.locate({ setView: true, watch: true }) /* This will return map so you can do chaining */
-map.on('locationfound', function (e) {
-  var marker = L.marker([e.latitude, e.longitude]).bindPopup('Your are here :)');
-  var circle = L.circle([e.latitude, e.longitude], e.accuracy / 2, {
-    weight: 1,
-    color: 'blue',
-    fillColor: '#cacaca',
-    fillOpacity: 0.2
-  });
-  map.addLayer(marker);
-  map.addLayer(circle);
-})
-map.on('locationerror', function (e) {
-  console.log(e);
-  alert("Location access denied.");
-});
+// map.locate({ setView: true, watch: true }) /* This will return map so you can do chaining */
+// map.on('locationfound', function (e) {
+//   var marker = L.marker([e.latitude, e.longitude]).bindPopup('Your are here :)');
+//   var circle = L.circle([e.latitude, e.longitude], e.accuracy / 2, {
+//     weight: 1,
+//     color: 'blue',
+//     fillColor: '#cacaca',
+//     fillOpacity: 0.2
+//   });
+//   map.addLayer(marker);
+//   map.addLayer(circle);
+// })
+// map.on('locationerror', function (e) {
+//   console.log(e);
+//   alert("Location access denied.");
+// });
 
 
 L.Control.CustomCommand = L.Control.extend({
