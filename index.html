@@ -12,29 +12,17 @@
   <link rel="manifest" href="src/manifest.json" />
 
   <title>World Covid Disribution</title>
-  <!-- <link rel="stylesheet" href="src/css/global.css" />
-  <link rel="stylesheet" href="src/css/leaflet.css" />
-  <link rel="stylesheet" href="src/css/leaflet-search.css" />
 
+
+  <link rel="stylesheet" href="src/css/global.css"/>
   <link rel="stylesheet" href="covid-distribution/src/css/global.css" />
-  <link rel="stylesheet" href="covid-distribution/src/css/leaflet.css" />
-  <link rel="stylesheet" href="covid-distribution/src/css/leaflet-search.css" /> -->
 
-  <link rel="stylesheet" href="src/css/global.css"/> 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" crossorigin=""/>
+
   <link rel="stylesheet" href="src/css/leaflet-search.css"/>
+  <link rel="stylesheet" href="covid-distribution/src/css/leaflet-search.css" /> 
 
-  <script src="src/js/chartjs.js"></script>
-  <script src="src/js/chartjs-plugin.js"></script>
-  <script src="src/js/chartjs-label-plugin.js"></script>
 
-  <!--   <script src="covid-distribution/src/js/chartjs.js"></script>
-  <script src="covid-distribution/src/js/chartjs-plugin.js"></script>
-  <script src="covid-distribution/src/js/chartjs-label-plugin.js"></script> -->
-
-  <style>
-
-  </style>
 </head>
 
 <body>
@@ -46,92 +34,17 @@
     <canvas id="chartCanvas"></canvas>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-  <!-- <script src="src/js/leaflet.js"></script> -->
-  <script src="src/js/leaflet-search.js"></script>
-  <script src="src/js/heatmap.js"></script>
-  <!-- <script src="src/js/leaflet-heat.js"></script> -->
-  <script src="src/js/heatmap-overlay.js"></script>
-  <script src="src/js/script_new.js"></script>
-
-  <!-- <script src="covid-distribution/src/js/leaflet.js"></script> 
-  <script src="covid-distribution/src/js/leaflet-search.js"></script>
-  <script src="covid-distribution/src/js/heatmap.js"></script>
-  <script src="covid-distribution/src/js/heatmap-overlay.js"></script>
-
-  <script src="covid-distribution/src/js/script_new.js"></script> -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" defer></script>
+  <script src="src/js/leaflet-search.js" defer></script>
+  <!--   <script src="src/js/heatmap.js" defer></script>-->
 
 
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha256-t9UJPrESBeG2ojKTIcFLPGF7nHi2vEc7f5A2KpH/UBU=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js" defer></script>
+  <script src="covid-distribution/src/js/chartjs-plugin.js" defer></script>
+  <script src="src/js/chartjs-plugin.js" defer></script>
 
-
-    var chart = new Chart('chartCanvas', {
-      type: 'doughnut',
-      data: {
-        labels: ['Active', 'Recoverd', 'Death'],
-        datasets: [{
-          data: [12, 19, 3],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.5)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-
-
-          ],
-          borderColor: [
-            'rgba(255,99,132,1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(54, 162, 235, 1)',
-
-
-          ],
-          borderWidth: 1
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-          display: true,
-          position: "bottom",
-          align: "center"
-        },
-        tooltips: {
-          enabled: true
-        },
-        title: {
-          display: true,
-          text: 'Summary'
-        },
-        elements: {
-          center: {
-            text: '5555555',
-            color: '#1D1E20', // Default is #000000
-            fontStyle: 'Arial', // Default is Arial
-            sidePadding: 20, // Default is 20 (as a percentage)
-            minFontSize: 5, // Default is 20 (in px), set to false and text will not wrap.
-            lineHeight: 25 // Default is 25 (in px), used for when text wraps
-          }
-        }
-      }
-
-
-
-    });
-    // chart.canvas.parentNode.style.height = '180px';
-    // chart.canvas.parentNode.style.width = '180px';
-
-    // map.on('zoom move', updateChart);
-    // CartoDB_Voyager.on('load', updateChart);
-
-    document.getElementById("info-pane").style.display = 'none';
-
-
-
-
-  </script>
+  <script src="src/js/script_new.js" defer></script>
 
 </body>
 

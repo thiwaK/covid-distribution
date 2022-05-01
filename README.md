@@ -16,12 +16,11 @@ _Powered By_
 
 [Live map]
 
-Give a ⭐️ if you like this project!
+Give a ⭐️ if you like
 ## Features
 
 - Country specific summary
-- Intersting look
-- Based on daily updating API
+- ~~Based on daily updating API~~
 
 
 ## Libraries
@@ -56,7 +55,6 @@ Start the server and edit what you want. Server runs at following address
 
 This project is MIT licensed.
 
-**Free Software, Hell Yeah!**
 
 
 [Chart.js]: <https://www.chartjs.org/>

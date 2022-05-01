@@ -100,8 +100,9 @@ var circlesWorld = L.layerGroup;
 var geo = []
 var markersLayer = new L.LayerGroup();
 var patientFeatureGroup = new L.featureGroup();
+var chart;
 
-// Secondary Functions ------------------------------------------------------------
+// Secondary Functions ------------------------------
 function messegeBoxFunctionality() {
     L.Control.Messagebox = L.Control.extend({
         options: {
@@ -146,6 +147,7 @@ function messegeBoxFunctionality() {
         return new L.Control.Messagebox(options);
     };
 }
+
 function additionalMapConfig() {
     map.attributionControl.setPrefix(false);
     map.dragging.enable();
@@ -153,6 +155,7 @@ function additionalMapConfig() {
     map.doubleClickZoom.enable();
     map.scrollWheelZoom.enable();
 }
+
 function addAdditionalTileLayers() {
     let baseMaps = {
         "Clean": clean,
@@ -165,119 +168,160 @@ function addAdditionalTileLayers() {
     L.control.layers(baseMaps).addTo(map);
 }
 
-// Primary Functions
-function CSVToArray(strData, strDelimiter) {
-    strDelimiter = (strDelimiter || ",");
-    var objPattern = new RegExp(
-        (
-            // Delimiters.
-            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+// Primary Functions ------------------------------
 
-            // Quoted fields.
-            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
-
-            // Standard fields.
-            "([^\"\\" + strDelimiter + "\\r\\n]*))"
-        ),
-        "gi"
-    );
+function initChart() {
+    chart = new Chart('chartCanvas', {
+    type: 'doughnut',
+    data: {
+      labels: ['Active', 'Recoverd', 'Death'],
+      datasets: [{
+        data: [12, 19, 3],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.5)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
 
 
-    // Create an array to hold our data. Give the array
-    // a default empty first row.
-    var arrData = [[]];
+        ],
+        borderColor: [
+          'rgba(255,99,132,1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(54, 162, 235, 1)',
 
-    // Create an array to hold our individual pattern
-    // matching groups.
-    var arrMatches = null;
 
-
-    // Keep looping over the regular expression matches
-    // until we can no longer find a match.
-    while (arrMatches = objPattern.exec(strData)) {
-
-        // Get the delimiter that was found.
-        var strMatchedDelimiter = arrMatches[1];
-
-        // Check to see if the given delimiter has a length
-        // (is not the start of string) and if it matches
-        // field delimiter. If id does not, then we know
-        // that this delimiter is a row delimiter.
-        if (
-            strMatchedDelimiter.length &&
-            strMatchedDelimiter !== strDelimiter
-        ) {
-
-            // Since we have reached a new row of data,
-            // add an empty row to our data array.
-            arrData.push([]);
-
+        ],
+        borderWidth: 1
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: "bottom",
+        align: "center"
+      },
+      tooltips: {
+        enabled: true
+      },
+      title: {
+        display: true,
+        text: 'Summary'
+      },
+      elements: {
+        center: {
+          text: '5555555',
+          color: '#1D1E20', // Default is #000000
+          fontStyle: 'Arial', // Default is Arial
+          sidePadding: 20, // Default is 20 (as a percentage)
+          minFontSize: 5, // Default is 20 (in px), set to false and text will not wrap.
+          lineHeight: 25 // Default is 25 (in px), used for when text wraps
         }
-
-        var strMatchedValue;
-
-        // Now that we have our delimiter out of the way,
-        // let's check to see which kind of value we
-        // captured (quoted or unquoted).
-        if (arrMatches[2]) {
-
-            // We found a quoted value. When we capture
-            // this value, unescape any double quotes.
-            strMatchedValue = arrMatches[2].replace(
-                new RegExp("\"\"", "g"),
-                "\""
-            );
-
-        } else {
-
-            // We found a non-quoted value.
-            strMatchedValue = arrMatches[3];
-
-        }
-
-
-        // Now that we have our value string, let's add
-        // it to the data array.
-        arrData[arrData.length - 1].push(strMatchedValue);
+      }
     }
+  });
+  // chart.canvas.parentNode.style.height = '180px';
+  // chart.canvas.parentNode.style.width = '180px';
 
-    // Return the parsed data.
-    return (arrData);
+  // map.on('zoom move', updateChart);
+  // CartoDB_Voyager.on('load', updateChart);
+
+  document.getElementById("info-pane").style.display = 'none';
 }
 
-function processData(allText) {
+function updateLocationOfCircles() {
+    count = 0;
+    while (dataBundle.countryName.length != count) {
 
-    var dataBundle = {
-        countryName: [],
-        lat: [],
-        lng: []
-    };
-    var allTextLines = allText.split(/\r\n|\n/);
-    var count = 1;
+        // console.log(dataBundle.countryName[count]);
 
-    while (allTextLines.length != count) {
-        // "Vanuatu", "VU", "VUT", "548", "-16", "167"
-        // console.log(allTextLines[count].split(',')[0]);
-        // dataBundle.countryCode[count] = allTextLines[count].split(',')[1];
+        var circleCenter = [dataBundle.lat[count], dataBundle.lng[count]];
+        var circleOptions = {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: .4,
+            weight: .5
+        }
 
-        let countryCode = allTextLines[count].match(/\".+?\"/g)[0].replace("\"", "").replace("\"", "");
-        let lat = allTextLines[count].match(/\".+?\"/g)[1].replace("\"", "").replace("\"", "");
-        let lng = allTextLines[count].match(/\".+?\"/g)[2].replace("\"", "").replace("\"", "");
-        let countryName = allTextLines[count].match(/\".+?\"/g)[3];
+        let circleSize = dataBundle.Confirmed[count] / 40;
+        // console.log(circleSize);
+        var circle = L.circle(circleCenter, circleSize, circleOptions);
 
-        dataBundle.countryName[countryCode] = countryName;
-        dataBundle.lat[countryCode] = parseFloat(lat);
-        dataBundle.lng[countryCode] = parseFloat(lng);
+        // circle.on('click', function(e){
+        //   console.log(e);
+        //   console.log(e.target._popup._content)
+        // });
+
+
+
+        // circle.bindPopup(
+        //   "<div id=\"popupTable\"><table>" +
+        //   "<tr><th colspan=2>" + dataBundle.countryName[count] + "</th></tr>" +
+        //   "<tr><td>🏥 Confirmed</td><td>" + dataBundle.Confirmed[count] + "</td></tr>" +
+        //   "<tr><td>🟢 Active</td><td>" + dataBundle.Active[count] + "</td></tr>" +
+        //   "<tr><td>🩹 Recovered</td><td>" + dataBundle.Recovered[count] + "</td></tr>" +
+        //   "<tr><td>💀 Deaths</td><td>" + dataBundle.Deaths[count] + "</td></tr>" +
+        //   "</table></div>"
+        // );
+
+        circle.bindPopup(
+            "{ \"data\": [\"" +
+            dataBundle.countryName[count] + "\"," +
+            dataBundle.Confirmed[count] + "," +
+            dataBundle.Active[count] + "," +
+            dataBundle.Recovered[count] + "," +
+            dataBundle.Deaths[count] + "]}"
+        );
+
+        circle.on("click", onClickCircle);
+
+
+        circlesArrayWorld.push(circle);
+
 
         count += 1;
     }
-
-    loadWorldSummary(dataBundle);
+    circlesWorld = L.layerGroup(circlesArrayWorld);
+    circlesWorld.addTo(map);
 }
 
+function onClickCircle(e) {
 
-let a = []
-function loadSLCovid() {
+    document.getElementById("info-pane").style.display = 'block';
+
+    var clickedCircle = e.target;
+    clickedCircle.closePopup();
+
+    const obj = JSON.parse(clickedCircle._popup._content);
+
+    chart.data.datasets[0].data[0] = obj.data[2];
+    chart.data.datasets[0].data[1] = obj.data[3];
+    chart.data.datasets[0].data[2] = obj.data[4];
+
+    chart.options.title.text = obj.data[0];
+    chart.options.elements.center.text = obj.data[1];
+    chart.options.legend.labels.boxWidth = 5;
+    chart.update();
+}
+
+function isNoData(str) {
+    if (str == null) return true;
+    else {
+        try {
+            if (str.length < 2) return true
+            else return false
+        } catch (error) {
+            return true
+        }
+    }
+}
+
+// LK Data ------------------------------
+
+function loadSLData() {
 
     const Http = new XMLHttpRequest();
     const url = 'https://nhss.gov.lk/api/suwapetha/getPatientData/covid';
@@ -288,7 +332,6 @@ function loadSLCovid() {
     isLoaded = true;
 
     Http.onloadend = (e) => {
-        // whole packet
 
         const obj = JSON.parse(Http.responseText);
         // console.log(obj.http_status);
@@ -331,49 +374,88 @@ function loadSLCovid() {
         // patientFeatureGroup.on("click", function (e) {
         //     slExtraInfo(e)
         // }).addTo(map);
-        geo = {
-            "type": "MultiPoint",
-            "coordinates": [[7., 80.], [7., 80.], [7., 79.], [6., 79.], [8., 80.], [7., 81.], [6., 79.]]
-        }
-        L.geoJSON(geo).addTo(map);
+
+        // geo = {
+        //     "type": "MultiPoint",
+        //     "coordinates": [[7., 80.], [7., 80.], [7., 79.], [6., 79.], [8., 80.], [7., 81.], [6., 79.]]
+        // }
+        // L.geoJSON(geo).addTo(map);
 
 
-        var heatmapLayer = new HeatmapOverlay(heatmapOverlayConfig);
-        heatmapLayer.setData(testData);
+        // var heatmapLayer = new HeatmapOverlay(heatmapOverlayConfig);
+        // heatmapLayer.setData(testData);
         //map.addLayer(heatmapLayer);
 
     }
-
 }
 
-function loadWorldData() {
+function slExtraInfo(context) {
 
-    let Http_3 = new XMLHttpRequest();
-    let url_3 = '/src/countries.csv';
-    Http_3.open("GET", url_3);
-    Http_3.send();
-
-    Http_3.onloadend = (e) => {
-        if (Http_3.status == 404) {
-            url_3 = '/covid-distribution/src/countries.csv';
-            Http_3.open("GET", url_3);
-            Http_3.send();
-
-            Http_3.onloadend = (e) => {
-                processData(Http_3.responseText);
-            }
-
-        }
-        else {
-            processData(Http_3.responseText);
-        }
+    const params = {
+        "id": 0,
+        "lat": context.latlng.lat,
+        "lng": context.latlng.lng,
+        "uid": 0
     }
 
+    console.log(context);
+
+
+    const http = new XMLHttpRequest();
+    const url = 'https://nhss.gov.lk/api/suwapetha/locationInfo';
+    http.open("POST", url, true);
+    http.setRequestHeader('Content-type', 'application/json;charset=utf-8');
+    http.setRequestHeader('User-Agent', 'okhttp/3.12.1');
+    http.setRequestHeader('Accept', 'application/json, text/plain, */*');
+    http.send(JSON.stringify(params));
+
+    http.onloadend = (e) => {
+
+        const obj = JSON.parse(http.responseText);
+        let popupString = "<table>";
+
+        if (obj.http_status == "success") {
+
+
+            popupString += "<tr><td> Reported </td><td>" + context.layer._popup._content + "</td></tr>"
+            popupString += "<tr><td colspan=2>" + obj.location.province + " Province - " + obj.location.district + "</td></tr>"
+            popupString += "<tr><td> DSD </td><td>" + obj.location.dsd + "</td></tr>"
+            popupString += "<tr><td> GND </td><td>" + obj.location.gndName + "</td></tr>"
+            popupString += "<tr><td> MOH </td><td>" + obj.location.MOH + "</td></tr>"
+            if (isNoData(obj.location.PHI) == false) popupString += "<tr><td> PHI </td><td>" + obj.location.PHI + "</td></tr>"
+
+            popupString += "</table>"
+            // {
+            //   "http_status": "success",
+            //   "location": {
+            //     "gndName": "Bandirippuwa North",
+            //     "province": "North Western",
+            //     "district": "Puttalam",
+            //     "dsd": "Wennappuwa",
+            //     "MOH": "Dankotuwa MOH",
+            //     "PHI": " ",
+            //     "phi_officer_name": " ",
+            //     "phi_officer_mobile": null,
+            //     "moh_officer": " ",
+            //     "moh_tel": null,
+            //     "MOH_Tel": "312258178"
+            //   }
+            // }
+        }
+
+
+
+        var clickedCircle = context.layer;
+        clickedCircle.bindPopup(popupString).openPopup();
+
+
+
+    };
 }
 
+// World Data ------------------------------
 
-function worldDataSource2(datesBack) {
-    // https://corona.lmao.ninja/v2/countries?yesterday&sort
+function secondaryWorldDataSource(datesBack) {
 
     var today = new Date();
     var yesterday = new Date();
@@ -532,8 +614,7 @@ function worldDataSource2(datesBack) {
     return dataBundle;
 }
 
-
-function worldDataSource3() {
+function primaryWorldDataSource() {
 
     const Http = new XMLHttpRequest();
     let url = 'https://corona.lmao.ninja/v2/countries?yesterday&sort';
@@ -545,9 +626,11 @@ function worldDataSource3() {
 
         var allText = "";
         if (Http.status != 200) {
-            worldDataSource2(1);
+            console.log("Pulling data from secondary source")
+            secondaryWorldDataSource(1);
 
         } else {
+            console.log("Primary source is OK")
             allText = Http.responseText;
 
             const obj = JSON.parse(allText);
@@ -649,171 +732,8 @@ function loadWorldSummary(dataBundle) {
 }
 
 
-function updateLocationOfCircles() {
-    count = 0;
-    while (dataBundle.countryName.length != count) {
 
-        // console.log(dataBundle.countryName[count]);
-
-        var circleCenter = [dataBundle.lat[count], dataBundle.lng[count]];
-        var circleOptions = {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: .4,
-            weight: .5
-        }
-
-        let circleSize = dataBundle.Confirmed[count] / 40;
-        // console.log(circleSize);
-        var circle = L.circle(circleCenter, circleSize, circleOptions);
-
-        // circle.on('click', function(e){
-        //   console.log(e);
-        //   console.log(e.target._popup._content)
-        // });
-
-
-
-        // circle.bindPopup(
-        //   "<div id=\"popupTable\"><table>" +
-        //   "<tr><th colspan=2>" + dataBundle.countryName[count] + "</th></tr>" +
-        //   "<tr><td>🏥 Confirmed</td><td>" + dataBundle.Confirmed[count] + "</td></tr>" +
-        //   "<tr><td>🟢 Active</td><td>" + dataBundle.Active[count] + "</td></tr>" +
-        //   "<tr><td>🩹 Recovered</td><td>" + dataBundle.Recovered[count] + "</td></tr>" +
-        //   "<tr><td>💀 Deaths</td><td>" + dataBundle.Deaths[count] + "</td></tr>" +
-        //   "</table></div>"
-        // );
-
-        circle.bindPopup(
-            "{ \"data\": [\"" +
-            dataBundle.countryName[count] + "\"," +
-            dataBundle.Confirmed[count] + "," +
-            dataBundle.Active[count] + "," +
-            dataBundle.Recovered[count] + "," +
-            dataBundle.Deaths[count] + "]}"
-        );
-
-        circle.on("click", circleClick);
-
-
-        circlesArrayWorld.push(circle);
-
-        //circle.addTo(map);
-
-
-
-        count += 1;
-    }
-    circlesWorld = L.layerGroup(circlesArrayWorld);
-    circlesWorld.addTo(map);
-
-}
-
-function circleClick(e) {
-
-    document.getElementById("info-pane").style.display = 'block';
-
-    var clickedCircle = e.target;
-    clickedCircle.closePopup();
-
-    const obj = JSON.parse(clickedCircle._popup._content);
-
-    //chart.data.datasets[0].data = [obj[1], obj[2], obj[3], obj[4]];
-    // chart.data.datasets[0].data[0] = obj.data[1];
-
-    // chart.data.datasets[0].data[0] = obj.data[1];
-    // chart.data.datasets[0].data[1] = obj.data[2];
-    // chart.data.datasets[0].data[2] = obj.data[3];
-    // chart.data.datasets[0].data[3] = obj.data[4];
-
-    chart.data.datasets[0].data[0] = obj.data[2];
-    chart.data.datasets[0].data[1] = obj.data[3];
-    chart.data.datasets[0].data[2] = obj.data[4];
-
-    chart.options.title.text = obj.data[0];
-    chart.options.elements.center.text = obj.data[1];
-    chart.options.legend.labels.boxWidth = 5;
-    chart.update();
-}
-
-function isNoData(str) {
-    if (str == null) return true;
-    else {
-        try {
-            if (str.length < 2) return true
-            else return false
-        } catch (error) {
-            return true
-        }
-    }
-}
-
-function slExtraInfo(context) {
-
-    const params = {
-        "id": 0,
-        "lat": context.latlng.lat,
-        "lng": context.latlng.lng,
-        "uid": 0
-    }
-
-    console.log(context);
-
-
-    const http = new XMLHttpRequest();
-    const url = 'https://nhss.gov.lk/api/suwapetha/locationInfo';
-    http.open("POST", url, true);
-    http.setRequestHeader('Content-type', 'application/json;charset=utf-8');
-    http.setRequestHeader('User-Agent', 'okhttp/3.12.1');
-    http.setRequestHeader('Accept', 'application/json, text/plain, */*');
-    http.send(JSON.stringify(params));
-
-    http.onloadend = (e) => {
-
-        const obj = JSON.parse(http.responseText);
-        let popupString = "<table>";
-
-        if (obj.http_status == "success") {
-
-
-            popupString += "<tr><td> Reported </td><td>" + context.layer._popup._content + "</td></tr>"
-            popupString += "<tr><td colspan=2>" + obj.location.province + " Province - " + obj.location.district + "</td></tr>"
-            popupString += "<tr><td> DSD </td><td>" + obj.location.dsd + "</td></tr>"
-            popupString += "<tr><td> GND </td><td>" + obj.location.gndName + "</td></tr>"
-            popupString += "<tr><td> MOH </td><td>" + obj.location.MOH + "</td></tr>"
-            if (isNoData(obj.location.PHI) == false) popupString += "<tr><td> PHI </td><td>" + obj.location.PHI + "</td></tr>"
-
-            popupString += "</table>"
-            // {
-            //   "http_status": "success",
-            //   "location": {
-            //     "gndName": "Bandirippuwa North",
-            //     "province": "North Western",
-            //     "district": "Puttalam",
-            //     "dsd": "Wennappuwa",
-            //     "MOH": "Dankotuwa MOH",
-            //     "PHI": " ",
-            //     "phi_officer_name": " ",
-            //     "phi_officer_mobile": null,
-            //     "moh_officer": " ",
-            //     "moh_tel": null,
-            //     "MOH_Tel": "312258178"
-            //   }
-            // }
-        }
-
-
-
-        var clickedCircle = context.layer;
-        clickedCircle.bindPopup(popupString).openPopup();
-
-
-
-    };
-}
-
-// Initalize the map
-
+// Initalize ------------------------------
 const map = L.map('map', majorMapConfig).setView([majorMapConfig.lat, majorMapConfig.lng], majorMapConfig.zoom);
 var southWest = L.latLng(-89.98155760646617, -180), northEast = L.latLng(89.99346179538875, 180);
 map.setMaxBounds(L.latLngBounds(southWest, northEast));
@@ -823,15 +743,15 @@ L.control.scale().addTo(map);
 map.addControl(searchControl);
 L.control.zoom({ position: 'topleft' }).addTo(map);
 
-// Events
+// Events - Search
 searchControl.on('search_locationfound', function (e) {
     console.log('search:locationfound');
-
 });
 searchControl.on('search_collapsed', function (e) {
     console.log('search:collapsed');
-
 });
+
+// Events - Map
 map.on("zoomstart", function (e) {
     // console.log("ZOOMSTART", e);
     // console.log("ZOOMEND", e.target._zoom); 
@@ -900,33 +820,26 @@ map.on('click', function (e) {
     // .openOn(map);        
 });
 
+// Load data
+primaryWorldDataSource();
+loadSLData();
+initChart();
+
+// Additional Features ------------------------------
 messegeBoxFunctionality();
 var box = L.control.messagebox({ timeout: 5000 }).addTo(map);
 
 // BOX
 var info = L.control();
 info.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'infoMy'); // create a div with a class "info"
+    this._div = L.DomUtil.create('div', 'infoMy');
     this.update();
     return this._div;
 };
-// method that we will use to update the control based on feature properties passed
 info.update = function (props) {
     this._div.innerHTML = '<div><canvas id="myChart"></canvas></div>';
 };
 // info.addTo(map);
-
-
-
-// let bulk = worldDataSource2(1);
-// worldDataSource3();
-loadSLCovid();
-
-
-function init() {
-
-}
-window.onload = init();
 
 // map.locate({ setView: true, watch: true }) /* This will return map so you can do chaining */
 // map.on('locationfound', function (e) {
@@ -968,3 +881,4 @@ map.addControl(removeAllControl);
 function MapShowCommand() {
     alert(55)
 }
+
