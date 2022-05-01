@@ -1,130 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="icon" href="src/images/favicon.png"/>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="src/images/favicon.png" />
 
-		<meta name="theme-color" content="#000000"/>
-		<meta name="description" content="Most upto date COVID-19 distribution map with detailed visualizations"/>
-		<link rel="apple-touch-icon" href="src/images/favicon.png"/>
-		<link rel="manifest" href="src/manifest.json"/>
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Most upto date COVID-19 distribution map with detailed visualizations" />
+  <link rel="apple-touch-icon" href="src/images/favicon.png" />
+  <link rel="manifest" href="src/manifest.json" />
 
-    <title>World Covid Disribution</title>
-    <link rel="stylesheet" href="src/css/global.css" />
-    <link rel="stylesheet" href="src/css/leaflet.css" />
-    <link rel="stylesheet" href="src/css/leaflet-search.css" />
+  <title>World Covid Disribution</title>
+  <!-- <link rel="stylesheet" href="src/css/global.css" />
+  <link rel="stylesheet" href="src/css/leaflet.css" />
+  <link rel="stylesheet" href="src/css/leaflet-search.css" />
 
-    <link rel="stylesheet" href="covid-distribution/src/css/global.css" />
-    <link rel="stylesheet" href="covid-distribution/src/css/leaflet.css" />
-    <link rel="stylesheet" href="covid-distribution/src/css/leaflet-search.css" />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script> -->
-    <script src="src/js/chartjs.js"></script>
-    <script src="src/js/chartjs-plugin.js"></script>
-    <script src="src/js/chartjs-label-plugin.js"></script>
+  <link rel="stylesheet" href="covid-distribution/src/css/global.css" />
+  <link rel="stylesheet" href="covid-distribution/src/css/leaflet.css" />
+  <link rel="stylesheet" href="covid-distribution/src/css/leaflet-search.css" /> -->
 
-    <script src="covid-distribution/src/js/chartjs.js"></script>
-    <script src="covid-distribution/src/js/chartjs-plugin.js"></script>
-    <script src="covid-distribution/src/js/chartjs-label-plugin.js"></script>
+  <link rel="stylesheet" href="covid-distribution/src/css/global.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="covid-distribution/src/css/leaflet-search.css" />
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script> -->
+  <script src="src/js/chartjs.js"></script>
+  <script src="src/js/chartjs-plugin.js"></script>
+  <script src="src/js/chartjs-label-plugin.js"></script>
 
-    <style>
+  <script src="covid-distribution/src/js/chartjs.js"></script>
+  <script src="covid-distribution/src/js/chartjs-plugin.js"></script>
+  <script src="covid-distribution/src/js/chartjs-label-plugin.js"></script>
 
-    </style>
-  </head>
+  <style>
 
-  <body>
+  </style>
+</head>
 
-    <div id="map"></div>
+<body>
 
-    <div id="info-pane" class="leaflet-bar chart-container">
-      <canvas id="chartCanvas"></canvas>
-    </div>
+  <div id="map">
+  </div>
 
-    <script src="src/js/leaflet.js" ></script>
-    <script src="src/js/leaflet-search.js"></script>
-    <script src="src/js/heatmap.js"></script>
-    <!-- <script src="src/js/leaflet-heat.js"></script> -->
-    <script src="src/js/heatmap-overlay.js"></script>
-    <script src="src/js/script.js"></script>
+  <div id="info-pane" class="leaflet-bar chart-container">
+    <canvas id="chartCanvas"></canvas>
+  </div>
 
-    <script src="covid-distribution/src/js/leaflet.js" ></script>
-    <script src="covid-distribution/src/js/leaflet-search.js"></script>
-    <script src="covid-distribution/src/js/heatmap.js"></script>
-    <script src="covid-distribution/src/js/heatmap-overlay.js"></script>
-    
-    <script src="covid-distribution/src/js/script.js"></script>
-   
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <!-- <script src="src/js/leaflet.js"></script> -->
+  <script src="src/js/leaflet-search.js"></script>
+  <script src="src/js/heatmap.js"></script>
+  <!-- <script src="src/js/leaflet-heat.js"></script> -->
+  <script src="src/js/heatmap-overlay.js"></script>
+  <script src="src/js/script_new.js"></script>
 
-    <script>
-     
-      var chart = new Chart('chartCanvas', {
-        type: 'doughnut',
-        data: {
-          labels: [ 'Active', 'Recoverd', 'Death'],
-          datasets: [{
-            data: [12, 19, 3],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.5)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              
-              
-            ],
-            borderColor: [
-              'rgba(255,99,132,1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(54, 162, 235, 1)',
-              
-              
-            ],
-            borderWidth: 1
-          }],
+  <!-- <script src="covid-distribution/src/js/leaflet.js"></script> -->
+  <script src="covid-distribution/src/js/leaflet-search.js"></script>
+  <script src="covid-distribution/src/js/heatmap.js"></script>
+  <script src="covid-distribution/src/js/heatmap-overlay.js"></script>
+
+  <script src="covid-distribution/src/js/script_new.js"></script>
+
+
+  <script>
+
+
+    var chart = new Chart('chartCanvas', {
+      type: 'doughnut',
+      data: {
+        labels: ['Active', 'Recoverd', 'Death'],
+        datasets: [{
+          data: [12, 19, 3],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+
+
+          ],
+          borderColor: [
+            'rgba(255,99,132,1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(54, 162, 235, 1)',
+
+
+          ],
+          borderWidth: 1
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          display: true,
+          position: "bottom",
+          align: "center"
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          legend: {
-            display: true,
-            position: "bottom",
-            align:"center"
-          },
-          tooltips: {
-            enabled: true
-          },
-          title: {
-            display: true,
-            text: 'Summary'
-          },
-          elements: {
-            center: {
-              text: '5555555',
-              color: '#1D1E20', // Default is #000000
-              fontStyle: 'Arial', // Default is Arial
-              sidePadding: 20, // Default is 20 (as a percentage)
-              minFontSize: 5, // Default is 20 (in px), set to false and text will not wrap.
-              lineHeight: 25 // Default is 25 (in px), used for when text wraps
-            }
+        tooltips: {
+          enabled: true
+        },
+        title: {
+          display: true,
+          text: 'Summary'
+        },
+        elements: {
+          center: {
+            text: '5555555',
+            color: '#1D1E20', // Default is #000000
+            fontStyle: 'Arial', // Default is Arial
+            sidePadding: 20, // Default is 20 (as a percentage)
+            minFontSize: 5, // Default is 20 (in px), set to false and text will not wrap.
+            lineHeight: 25 // Default is 25 (in px), used for when text wraps
           }
         }
+      }
 
-        
 
-      });
-      // chart.canvas.parentNode.style.height = '180px';
-      // chart.canvas.parentNode.style.width = '180px';
-  
-      // map.on('zoom move', updateChart);
-      // CartoDB_Voyager.on('load', updateChart);
-    
-      document.getElementById("info-pane").style.display = 'none';
-    
-      
-      
-      
-    </script>
- 
-  </body>
+
+    });
+    // chart.canvas.parentNode.style.height = '180px';
+    // chart.canvas.parentNode.style.width = '180px';
+
+    // map.on('zoom move', updateChart);
+    // CartoDB_Voyager.on('load', updateChart);
+
+    document.getElementById("info-pane").style.display = 'none';
+
+
+
+
+  </script>
+
+</body>
+
 </html>
